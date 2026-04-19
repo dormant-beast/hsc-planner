@@ -2,64 +2,175 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin View Fixed | DORMANT BEAST</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>DORMANT BEAST | Full Study Platform</title>
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background: #0b1120; font-family: system-ui; }
-    .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); border-radius: 1.5rem; border: 1px solid rgba(255,255,255,0.1); }
-    button { transition: all 0.2s; }
-    button:hover { transform: scale(1.02); }
+    body { background: radial-gradient(circle at 10% 20%, #0b1120, #030712); font-family: 'Inter', system-ui; }
+    .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 2rem; }
+    .btn-glow { background: linear-gradient(135deg, #facc15, #eab308); transition: transform 0.1s; }
+    .btn-glow:hover { transform: scale(1.02); box-shadow: 0 10px 20px -5px rgba(250,204,21,0.4); }
+    .timer-ring { transition: stroke-dashoffset 0.2s linear; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #1e293b; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #facc15; border-radius: 10px; }
   </style>
 </head>
-<body class="text-white p-4">
+<body class="text-white antialiased">
 
-<div class="max-w-6xl mx-auto">
-  <!-- Header -->
-  <div class="flex justify-between items-center mb-6 glass p-4 rounded-2xl">
-    <h1 class="text-2xl font-bold text-yellow-400">DORMANT BEAST</h1>
-    <div id="userInfo" class="flex gap-3"></div>
+<div class="max-w-7xl mx-auto px-4 py-6">
+  <!-- Header with menu -->
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-8 glass-card px-6 py-3">
+    <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">DORMANT BEAST</h1>
+    <div class="flex gap-2 flex-wrap">
+      <button id="showPlannerBtn" class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-sm">📘 Planner</button>
+      <button id="showTimerBtn" class="px-4 py-2 rounded-full bg-yellow-500/20 text-sm border border-yellow-500/40">⏱️ Pomodoro</button>
+      <button id="showRankingBtn" class="px-4 py-2 rounded-full bg-white/10 text-sm">🏆 Ranking</button>
+      <button id="showReportBtn" class="px-4 py-2 rounded-full bg-white/10 text-sm">📊 Weekly Report</button>
+    </div>
+    <div id="userStatusArea" class="flex items-center gap-3"></div>
   </div>
 
   <!-- Login Panel -->
-  <div id="loginBox" class="glass max-w-md mx-auto p-6 text-center">
-    <h2 class="text-2xl mb-2">Welcome</h2>
-    <select id="role" class="bg-black/50 border border-white/20 rounded-full px-4 py-2 mb-3">
+  <div id="loginPanel" class="glass-card max-w-md mx-auto p-8 text-center">
+    <h2 class="text-3xl font-bold">Welcome</h2>
+    <p class="text-white/50 text-sm mt-2">Sign in to track progress</p>
+    <select id="roleSelect" class="mt-4 bg-black/40 border border-white/20 rounded-full px-4 py-2 text-white">
       <option value="member">📖 Member (Google)</option>
       <option value="admin">👑 Admin</option>
     </select>
-    <div id="memberLoginDiv">
-      <button id="googleBtn" class="bg-yellow-500 text-black font-bold w-full py-2 rounded-full">🔐 Sign in with Google</button>
+    <div id="memberLoginArea" class="mt-4">
+      <button id="googleSignInBtn" class="btn-glow w-full text-black font-semibold py-3 rounded-full">🔐 Sign in with Google</button>
     </div>
-    <div id="adminLoginDiv" class="hidden">
-      <input type="password" id="adminPwd" placeholder="Admin password" class="w-full bg-black/50 border border-white/20 rounded-full px-4 py-2 mb-2">
-      <button id="adminLoginBtn" class="bg-white/20 w-full py-2 rounded-full">Login as Admin</button>
+    <div id="adminLoginArea" class="hidden mt-4 space-y-3">
+      <input type="password" id="adminPassword" placeholder="Admin password" class="w-full bg-black/40 border border-white/20 rounded-full px-4 py-2 text-sm">
+      <button id="adminLoginBtn" class="bg-white/10 hover:bg-white/20 w-full py-2 rounded-full">Login as Admin</button>
     </div>
   </div>
 
-  <!-- Admin Panel (hidden initially) -->
-  <div id="adminPanel" class="hidden mt-6">
-    <div class="flex gap-3 mb-4">
-      <button id="showMembersBtn" class="bg-white/10 px-4 py-2 rounded-full">📋 Members</button>
-      <button id="exportBtn" class="bg-white/10 px-4 py-2 rounded-full">📁 Export JSON</button>
+  <!-- Admin Panel (hidden) -->
+  <div id="adminPanel" class="hidden glass-card p-4 mb-6">
+    <div class="flex flex-wrap gap-3">
+      <button id="exportAllDataBtn" class="bg-white/10 px-4 py-2 rounded-full text-sm">📁 Export JSON</button>
+      <button id="memberListBtn" class="bg-white/10 px-4 py-2 rounded-full text-sm">📋 Members</button>
+      <button id="homeBtn" class="bg-white/10 px-4 py-2 rounded-full text-sm">🏠 Home</button>
     </div>
-    <div id="memberList" class="glass p-4 overflow-x-auto"></div>
+    <div id="adminStatus" class="text-yellow-400 text-xs mt-2"></div>
+  </div>
+  <div id="adminUserListContainer" class="hidden glass-card p-4 mb-6 overflow-x-auto"></div>
+
+  <!-- Weekly Report Section -->
+  <div id="reportSection" class="mb-12 hidden">
+    <div class="glass-card p-6">
+      <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-5">
+        <h2 class="text-2xl font-bold">Weekly Report</h2>
+        <div class="flex gap-2">
+          <button id="prevWeekBtn" class="bg-white/10 px-3 py-1 rounded-full text-sm">◀ Previous</button>
+          <button id="nextWeekBtn" class="bg-white/10 px-3 py-1 rounded-full text-sm">Next ▶</button>
+          <button id="currentWeekBtn" class="bg-yellow-500/30 px-3 py-1 rounded-full text-sm">Current</button>
+        </div>
+      </div>
+      <div id="reportContent" class="space-y-6"><div class="text-center text-white/40 py-10">Loading...</div></div>
+    </div>
   </div>
 
-  <!-- Planner View (for members and admin viewing) -->
-  <div id="plannerView" class="hidden mt-6">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold" id="viewingTitle">Study Planner</h2>
-      <button id="closePlannerBtn" class="bg-red-500/50 px-3 py-1 rounded-full text-sm">✖ Close</button>
+  <!-- Ranking Section -->
+  <div id="rankingSection" class="mb-12 hidden">
+    <div class="glass-card p-6">
+      <div class="flex items-center gap-3 border-b border-white/10 pb-4 mb-5"><span class="text-3xl">🏆</span><h2 class="text-2xl font-bold">Study Leaderboard</h2><span class="text-xs bg-yellow-500/20 px-3 py-1 rounded-full ml-auto">Total focus minutes</span></div>
+      <div id="rankingList" class="space-y-3 max-h-[500px] overflow-y-auto pr-2"><div class="text-center text-white/40 py-8">Loading...</div></div>
+      <div class="mt-6 pt-4 border-t border-white/10 text-center text-sm text-white/40">💡 Complete focus sessions to earn minutes</div>
     </div>
-    <div id="plannerContent" class="glass p-4 space-y-4"></div>
   </div>
+
+  <!-- Pomodoro Timer Section -->
+  <div id="timerSection" class="mb-12">
+    <div class="glass-card p-6 md:p-8">
+      <div class="flex flex-col lg:flex-row gap-8">
+        <div class="flex-1 flex flex-col items-center">
+          <div class="relative w-64 h-64 md:w-80 md:h-80">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6" />
+              <circle id="timerRing" cx="50" cy="50" r="45" fill="none" stroke="url(#gradient)" stroke-width="6" stroke-linecap="round" stroke-dasharray="282.74" stroke-dashoffset="0" class="timer-ring" />
+              <defs><linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#facc15"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient></defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="timerDisplay" class="text-5xl md:text-7xl font-mono font-bold tracking-wider">25:00</span>
+              <span id="sessionLabel" class="text-sm text-yellow-400/80 mt-2">Focus Session</span>
+            </div>
+          </div>
+          <div class="flex gap-3 mt-8">
+            <button id="startTimerBtn" class="btn-glow text-black font-bold px-7 py-3 rounded-full">▶ Start</button>
+            <button id="pauseTimerBtn" class="bg-white/10 hover:bg-white/20 px-7 py-3 rounded-full">⏸ Pause</button>
+            <button id="resetTimerBtn" class="bg-white/10 hover:bg-white/20 px-7 py-3 rounded-full">⟳ Reset</button>
+          </div>
+        </div>
+        <div class="flex-1 space-y-5">
+          <div class="flex gap-2 p-1 rounded-full bg-black/30">
+            <button data-session="focus" class="session-tab flex-1 py-2 rounded-full text-sm font-medium transition-all bg-yellow-500/30 text-white">🎯 Focus</button>
+            <button data-session="shortBreak" class="session-tab flex-1 py-2 rounded-full text-sm font-medium text-white/70">☕ Short break</button>
+            <button data-session="longBreak" class="session-tab flex-1 py-2 rounded-full text-sm font-medium text-white/70">🌿 Long break</button>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="glass-card p-3 text-center"><div class="text-2xl font-bold text-yellow-400" id="totalSessionsToday">0</div><div class="text-xs text-white/50">Sessions today</div></div>
+            <div class="glass-card p-3 text-center"><div class="text-2xl font-bold text-yellow-400" id="totalMinutesToday">0</div><div class="text-xs text-white/50">Minutes today</div></div>
+            <div class="glass-card p-3 text-center col-span-2"><div class="text-xl font-bold text-yellow-400" id="streakCount">0</div><div class="text-xs text-white/50">🔥 Current streak (days)</div></div>
+          </div>
+          <button id="openSettingsBtn" class="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 py-2 rounded-full text-sm">⚙️ Customize durations</button>
+          <div><h3 class="text-sm font-semibold text-white/60 mb-2">Recent sessions</h3><div id="historyList" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="glass-card w-11/12 max-w-md p-6">
+      <h3 class="text-xl font-bold mb-4">Customize durations (minutes)</h3>
+      <div class="space-y-4">
+        <div><label class="block text-sm mb-1">Focus</label><input type="number" id="focusDuration" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2" value="25"></div>
+        <div><label class="block text-sm mb-1">Short break</label><input type="number" id="shortBreakDuration" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2" value="5"></div>
+        <div><label class="block text-sm mb-1">Long break</label><input type="number" id="longBreakDuration" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2" value="15"></div>
+        <div class="flex gap-3 pt-2"><button id="saveSettingsBtn" class="btn-glow text-black font-bold flex-1 py-2 rounded-full">Save</button><button id="closeSettingsBtn" class="bg-white/10 flex-1 py-2 rounded-full">Cancel</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Planner Section -->
+  <div id="plannerSection" class="hidden">
+    <div class="glass-card p-6 mb-6 text-center">
+      <div class="flex justify-between items-center flex-wrap gap-2">
+        <div><span class="text-sm text-white/60">Total tasks</span><div class="text-2xl font-bold" id="totalTaskDisplay">0</div></div>
+        <div><span class="text-sm text-white/60">Completed</span><div class="text-2xl font-bold text-yellow-400" id="pgTxtShort">0%</div></div>
+        <div class="flex-1 max-w-md"><div class="h-2 bg-white/10 rounded-full overflow-hidden"><div id="pgBar" class="h-full bg-gradient-to-r from-yellow-500 to-amber-500 w-0 transition-all"></div></div></div>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-3 mb-6">
+      <select id="subjectFilter" class="bg-black/30 border border-white/20 rounded-full px-4 py-2 text-sm">
+        <option value="all">All subjects</option>
+        <option value="পদার্থবিজ্ঞান ১ম পত্র">Physics 1st</option><option value="পদার্থবিজ্ঞান ২য় পত্র">Physics 2nd</option>
+        <option value="রসায়ন ১ম পত্র">Chemistry 1st</option><option value="রসায়ন ২য় পত্র">Chemistry 2nd</option>
+        <option value="জীববিজ্ঞান ১ম পত্র">Biology 1st</option><option value="জীববিজ্ঞান ২য় পত্র">Biology 2nd</option>
+        <option value="উচ্চতর গণিত ১ম পত্র">Higher Math 1st</option><option value="উচ্চতর গণিত ২য় পত্র">Higher Math 2nd</option>
+        <option value="তথ্য ও যোগাযোগ প্রযুক্তি">ICT</option>
+      </select>
+      <div id="weekButtons" class="flex flex-wrap gap-2"></div>
+      <button id="memberHomeBtn" class="ml-auto bg-yellow-500/20 px-4 py-2 rounded-full text-sm hidden">🏠 Home</button>
+      <button id="adminBackToListBtn" class="ml-2 bg-white/10 px-4 py-2 rounded-full text-sm hidden">◀ Back to Members</button>
+    </div>
+    <div id="plannerContainer" class="space-y-6"></div>
+  </div>
+
+  <button id="downloadBtn" class="fixed bottom-6 right-6 bg-white/10 backdrop-blur-md w-12 h-12 rounded-full text-xl hover:bg-white/20">📥</button>
 </div>
 
 <script>
+  // ========== FIREBASE ==========
   const firebaseConfig = {
     apiKey: "AIzaSyCKAI1QVzRvOHYlhUWo2LE-82zoFI2bmJ0",
     authDomain: "hsc-planner-1b02f.firebaseapp.com",
@@ -74,214 +185,125 @@
   const auth = firebase.auth();
   const provider = new firebase.auth.GoogleAuthProvider();
 
+  // ========== GLOBAL STATE ==========
   let currentUser = null;
   let isAdmin = false;
   let viewingUserId = null;
+  let activeWeek = null, currentSubject = 'all';
 
-  // ---------- অধ্যায়ের ডাটা (শুধু ৭৮টি অধ্যায়ের নাম, ৬ সপ্তাহে ভাগ) ----------
-  const chapters = [
-    "Thermodynamics", "Static Electricity", "Current Electricity", "Magnetic Effect of Current", "Electromagnetic Induction",
-    "Geometrical Optics", "Physical Optics", "Introduction to Modern Physics", "Atomic Models & Nuclear Physics", "Semiconductors & Electronics",
-    "Vectors", "Dynamics", "Newtonian Mechanics", "Work Power Energy", "Gravitation", "Properties of Matter", "Circular Motion", "Waves", "Kinetic Theory of Gases",
-    "Qualitative Chemistry", "Periodic Properties & Chemical Bonding", "Chemical Changes", "Applied Chemistry",
-    "Environmental Chemistry", "Organic Chemistry", "Quantitative Chemistry", "Electrochemistry", "Economic Chemistry",
-    "Cell & Its Structure", "Cell Division", "Cell Chemistry", "Microorganisms", "Algae & Fungi", "Bryophyta & Pteridophyta", "Gymnosperms & Angiosperms", "Tissue & Tissue System", "Plant Physiology", "Plant Breeding", "Biotechnology", "Ecology & Conservation",
-    "Animal Diversity & Classification", "Introduction to Animals", "Digestion & Absorption", "Blood & Circulation", "Respiration & Breathing", "Excretion", "Movement & Locomotion", "Coordination & Control", "Human Continuity", "Human Defense", "Genetics & Evolution", "Animal Behavior",
-    "Matrices & Determinants", "Vectors", "Straight Lines", "Circles", "Permutation & Combination", "Trigonometric Ratios", "Trigonometric Ratios of Compound Angles", "Functions & Graphs", "Differentiation", "Integration",
-    "Real Numbers & Inequalities", "Linear Programming", "Complex Numbers", "Polynomials & Equations", "Binomial Expansion", "Conics", "Inverse Trigonometry", "Statics", "Dynamics of a Particle", "Probability & Statistics",
-    "Bangladesh & Global Context", "Communication Systems & Networking", "Number System & Digital Devices", "Web Design & HTML", "Programming Languages", "Database Management System"
+  // ========== POMODORO VARIABLES ==========
+  let timerInterval = null;
+  let currentSessionType = 'focus';
+  let timeRemaining = 25 * 60;
+  let totalFocusSessionsCompleted = 0;
+  let settings = { focus: 25, shortBreak: 5, longBreak: 15 };
+  let sessionHistory = [];
+  let reportWeekOffset = 0;
+
+  // Load pomodoro settings & history
+  function loadSettings() { const s = localStorage.getItem('pomodoro_settings'); if(s) settings = { ...settings, ...JSON.parse(s) }; document.getElementById('focusDuration').value = settings.focus; document.getElementById('shortBreakDuration').value = settings.shortBreak; document.getElementById('longBreakDuration').value = settings.longBreak; }
+  function saveSettings() { localStorage.setItem('pomodoro_settings', JSON.stringify(settings)); resetTimerUI(); }
+  const savedHistory = localStorage.getItem('pomodoro_history'); if(savedHistory) sessionHistory = JSON.parse(savedHistory); else sessionHistory = [];
+  function addToHistory(type, duration) { sessionHistory.unshift({ type, duration, completedAt: Date.now() }); if(sessionHistory.length>10) sessionHistory.pop(); localStorage.setItem('pomodoro_history', JSON.stringify(sessionHistory)); renderHistory(); updateStats(); }
+  function renderHistory() { const cont = document.getElementById('historyList'); if(!sessionHistory.length) { cont.innerHTML='<div class="text-center text-white/40 text-sm py-2">No sessions yet</div>'; return; } cont.innerHTML = sessionHistory.map(h => `<div class="flex justify-between text-sm p-2 bg-white/5 rounded-lg"><span>${h.type==='focus'?'🎯 Focus':h.type==='shortBreak'?'☕ Short break':'🌿 Long break'}</span><span>${h.duration} min</span><span class="text-white/40">${Math.floor((Date.now()-h.completedAt)/60000)}m ago</span></div>`).join(''); }
+  function updateStats() { const today = new Date().toDateString(); const todayFocus = sessionHistory.filter(h => new Date(h.completedAt).toDateString() === today && h.type === 'focus'); const totalMins = todayFocus.reduce((s,h)=>s+h.duration,0); document.getElementById('totalSessionsToday').innerText = todayFocus.length; document.getElementById('totalMinutesToday').innerText = totalMins; let streak=0; let d=new Date(); for(let i=0;i<30;i++){ const dateStr=d.toDateString(); const has=sessionHistory.some(h=>new Date(h.completedAt).toDateString()===dateStr && h.type==='focus'); if(has) streak++; else break; d.setDate(d.getDate()-1); } document.getElementById('streakCount').innerText = streak; }
+  const circumference = 2*Math.PI*45;
+  function updateTimerDisplay() { const m=Math.floor(timeRemaining/60); const s=timeRemaining%60; document.getElementById('timerDisplay').innerText=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; const total=settings[currentSessionType]*60; const offset=circumference-(timeRemaining/total)*circumference; document.getElementById('timerRing').style.strokeDashoffset=offset; }
+  function setSessionLabel() { const labels={focus:'Focus Session',shortBreak:'Short Break',longBreak:'Long Break'}; document.getElementById('sessionLabel').innerText=labels[currentSessionType]; }
+  function playBeep() { try{ const audioCtx=new (window.AudioContext||window.webkitAudioContext)(); const osc=audioCtx.createOscillator(); const gain=audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value=880; gain.gain.value=0.3; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime+1); osc.stop(audioCtx.currentTime+1); audioCtx.resume(); }catch(e){} }
+  function resetTimerUI() { if(timerInterval) clearInterval(timerInterval); timerInterval=null; timeRemaining=settings[currentSessionType]*60; updateTimerDisplay(); setSessionLabel(); }
+  function startTimer() { if(timerInterval) clearInterval(timerInterval); timerInterval = setInterval(() => { if(timeRemaining <= 1) { clearInterval(timerInterval); timerInterval=null; playBeep(); const duration = settings[currentSessionType]; addToHistory(currentSessionType, duration); if(currentSessionType === 'focus' && currentUser && !isAdmin) { db.ref(`users/${currentUser.uid}/info`).transaction(info => { if(!info) info = { totalMinutes: 0 }; info.totalMinutes = (info.totalMinutes || 0) + duration; return info; }); saveFocusMinutesToWeekly(currentUser.uid, duration); if(!document.getElementById('reportSection').classList.contains('hidden')) refreshReport(currentUser.uid, reportWeekOffset); } if(currentSessionType === 'focus') { totalFocusSessionsCompleted++; if(totalFocusSessionsCompleted % 4 === 0) currentSessionType = 'longBreak'; else currentSessionType = 'shortBreak'; } else { currentSessionType = 'focus'; } timeRemaining = settings[currentSessionType] * 60; updateTimerDisplay(); setSessionLabel(); startTimer(); } else { timeRemaining--; updateTimerDisplay(); } }, 1000); }
+  function switchSession(type) { if(timerInterval) clearInterval(timerInterval); timerInterval=null; currentSessionType=type; timeRemaining=settings[type]*60; updateTimerDisplay(); setSessionLabel(); document.querySelectorAll('.session-tab').forEach(tab=>{ if(tab.dataset.session===type) tab.classList.add('bg-yellow-500/30','text-white'); else tab.classList.remove('bg-yellow-500/30','text-white'); }); }
+
+  // ========== WEEKLY REPORT ==========
+  async function saveFocusMinutesToWeekly(uid, minutes) {
+    const now = new Date(); const day = now.getDay(); const start = new Date(now); start.setDate(now.getDate() - (day===0?6:day-1)); start.setHours(0,0,0,0);
+    const weekKey = `${start.getFullYear()}-${start.getMonth()+1}-${start.getDate()}`; const dateStr = now.toISOString().slice(0,10);
+    await db.ref(`users/${uid}/weeklyReport/${weekKey}/days/${dateStr}`).transaction(c => (c||0)+minutes);
+  }
+  async function loadWeeklyReport(uid, offset) {
+    const now = new Date(); const day = now.getDay(); let start = new Date(now); start.setDate(now.getDate() - (day===0?6:day-1) + offset*7); start.setHours(0,0,0,0);
+    const weekKey = `${start.getFullYear()}-${start.getMonth()+1}-${start.getDate()}`;
+    const daysSnap = await db.ref(`users/${uid}/weeklyReport/${weekKey}/days`).once('value');
+    const daysData = daysSnap.val()||{};
+    const daily = []; let total=0;
+    for(let i=0;i<7;i++){ const d=new Date(start); d.setDate(start.getDate()+i); const mins = daysData[d.toISOString().slice(0,10)]||0; daily.push(mins); total+=mins; }
+    const tasksSnap = await db.ref(`users/${uid}/tasks`).once('value');
+    const tasks = tasksSnap.val()||{}; let completed=0;
+    for(let i=0;i<78;i++){ if(tasks[`${i}_cq`]) completed++; if(tasks[`${i}_mcq`]) completed++; if(tasks[`${i}_kokh`]) completed++; }
+    return { weekKey, startDate:start, endDate:new Date(start.getTime()+6*86400000), dailyMinutes:daily, totalMinutes:total, completedTasks:completed, totalTasks:78*3 };
+  }
+  function renderReport(report) { if(!report) return; const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun']; const maxMin = Math.max(...report.dailyMinutes,10); let bars=''; for(let i=0;i<7;i++){ const p = (report.dailyMinutes[i]/maxMin)*100; bars+=`<div class="flex-1 text-center"><div class="h-32 flex items-end justify-center"><div class="w-full max-w-[40px] bg-gradient-to-t from-yellow-500 to-amber-500 rounded-t-lg transition-all" style="height: ${p}%; min-height:4px;"></div></div><div class="text-xs mt-2">${days[i]}</div><div class="text-xs font-bold text-yellow-400">${report.dailyMinutes[i]} min</div></div>`; }
+    const startStr = `${report.startDate.getDate()}/${report.startDate.getMonth()+1}`; const endStr = `${report.endDate.getDate()}/${report.endDate.getMonth()+1}`; const percent = Math.round((report.completedTasks/report.totalTasks)*100);
+    document.getElementById('reportContent').innerHTML = `<div class="text-center mb-4"><span class="text-lg font-semibold">${startStr} - ${endStr}</span><span class="ml-3 text-sm bg-yellow-500/20 px-3 py-1 rounded-full">Week ${report.weekKey}</span></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="glass-card p-4"><h3 class="font-bold mb-3">📈 Daily Focus Minutes</h3><div class="flex justify-between items-end gap-1 h-40">${bars}</div><div class="mt-4 text-center"><span class="text-2xl font-bold text-yellow-400">${report.totalMinutes}</span> <span class="text-white/60">minutes</span><div class="text-xs text-white/40">Total this week</div></div></div><div class="glass-card p-4 space-y-4"><div><h3 class="font-bold mb-2">✅ Task Progress</h3><div class="flex justify-between text-sm mb-1"><span>Completed: ${report.completedTasks}</span><span>Total: ${report.totalTasks}</span></div><div class="h-2 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-yellow-500 rounded-full" style="width: ${percent}%"></div></div><div class="text-right text-xs text-yellow-400 mt-1">${percent}%</div></div><div><h3 class="font-bold mb-2">🎯 Weekly Goal</h3><div class="flex justify-between"><span>Focus minutes</span><span class="font-bold">${report.totalMinutes} / 500</span></div><div class="h-2 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-yellow-500 to-amber-500 rounded-full" style="width: ${Math.min(100, (report.totalMinutes/500)*100)}%"></div></div><div class="text-right text-xs text-white/40 mt-1">Target: 500 min/week</div></div></div></div>`;
+  }
+  async function refreshReport(uid, offset) { if(!uid) return; const r = await loadWeeklyReport(uid, offset); renderReport(r); }
+
+  // ========== PLANNER DATA (78 chapters, English names, 6 weeks) ==========
+  const allChapters = [
+    { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Thermodynamics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Static Electricity" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Current Electricity" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Magnetic Effect of Current" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Electromagnetic Induction" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Geometrical Optics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Physical Optics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Introduction to Modern Physics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Atomic Models & Nuclear Physics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Semiconductors & Electronics" },
+    { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Vectors" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Dynamics" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Newtonian Mechanics" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Work, Power & Energy" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Gravitation" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Properties of Matter" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Circular Motion" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Waves" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Kinetic Theory of Gases" },
+    { subject: "রসায়ন ১ম পত্র", chapter: "Qualitative Chemistry" },{ subject: "রসায়ন ১ম পত্র", chapter: "Periodic Properties & Chemical Bonding" },{ subject: "রসায়ন ১ম পত্র", chapter: "Chemical Changes" },{ subject: "রসায়ন ১ম পত্র", chapter: "Applied Chemistry" },
+    { subject: "রসায়ন ২য় পত্র", chapter: "Environmental Chemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Organic Chemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Quantitative Chemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Electrochemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Economic Chemistry" },
+    { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Cell & Its Structure" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Cell Division" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Cell Chemistry" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Microorganisms" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Algae & Fungi" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Bryophyta & Pteridophyta" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Gymnosperms & Angiosperms" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Tissue & Tissue System" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Plant Physiology" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Plant Breeding" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Biotechnology" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Ecology & Conservation" },
+    { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Animal Diversity & Classification" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Introduction to Animals" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Digestion & Absorption" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Blood & Circulation" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Respiration & Breathing" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Excretion" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Movement & Locomotion" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Coordination & Control" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Human Continuity" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Human Defense" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Genetics & Evolution" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Animal Behavior" },
+    { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Matrices & Determinants" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Vectors" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Straight Lines" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Circles" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Permutation & Combination" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Trigonometric Ratios" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Trigonometric Ratios of Compound Angles" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Functions & Graphs" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Differentiation" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Integration" },
+    { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Real Numbers & Inequalities" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Linear Programming" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Complex Numbers" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Polynomials & Equations" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Binomial Expansion" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Conics" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Inverse Trigonometry" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Statics" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Dynamics of a Particle" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Probability & Statistics" },
+    { subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Bangladesh & Global Context" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Communication Systems & Networking" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Number System & Digital Devices" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Web Design & HTML" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Programming Languages" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Database Management System" }
   ];
-  const totalChapters = chapters.length; // 78
-  // 6 সপ্তাহে ভাগ (প্রতি সপ্তাহে ১৩টি)
-  const weeks = [];
-  for (let i = 0; i < 6; i++) {
-    weeks.push({ id: i+1, start: i*13, end: (i+1)*13 - 1 });
-  }
-
-  // ডিফল্ট টাস্ক স্টেট
-  function defaultTasks() {
-    let tasks = {};
-    for (let i = 0; i < totalChapters; i++) {
-      tasks[`${i}_cq`] = false;
-      tasks[`${i}_mcq`] = false;
-      tasks[`${i}_kokh`] = false;
-    }
-    return tasks;
-  }
-
-  // প্ল্যানার রেন্ডার (readOnly = true মানে শুধু দেখা, এডিট নয়)
-  function renderPlanner(tasks, readOnly, userName) {
-    const container = document.getElementById('plannerContent');
-    container.innerHTML = '';
-    if (!tasks) tasks = defaultTasks();
-    document.getElementById('viewingTitle').innerText = `📘 ${userName}'s Study Progress`;
-    
-    for (let week of weeks) {
-      const weekDiv = document.createElement('div');
-      weekDiv.className = 'border border-white/10 rounded-xl p-3 mb-3';
-      weekDiv.innerHTML = `<h3 class="font-bold text-yellow-400 mb-2">Week ${week.id}</h3><div class="grid gap-2" id="week-${week.id}"></div>`;
-      container.appendChild(weekDiv);
-      const weekContainer = weekDiv.querySelector(`#week-${week.id}`);
-      
-      for (let idx = week.start; idx <= week.end; idx++) {
-        const chap = chapters[idx];
-        const cqDone = tasks[`${idx}_cq`];
-        const mcqDone = tasks[`${idx}_mcq`];
-        const kokhDone = tasks[`${idx}_kokh`];
-        
-        const card = document.createElement('div');
-        card.className = 'bg-white/5 rounded-lg p-2 flex flex-wrap justify-between items-center gap-2';
-        card.innerHTML = `
-          <div class="text-sm font-medium w-48">${idx+1}. ${chap}</div>
-          <div class="flex gap-3">
-            <label class="flex items-center gap-1 text-xs"><input type="checkbox" ${cqDone ? 'checked' : ''} ${readOnly ? 'disabled' : ''} data-idx="${idx}" data-type="cq"> CQ</label>
-            <label class="flex items-center gap-1 text-xs"><input type="checkbox" ${mcqDone ? 'checked' : ''} ${readOnly ? 'disabled' : ''} data-idx="${idx}" data-type="mcq"> MCQ</label>
-            <label class="flex items-center gap-1 text-xs"><input type="checkbox" ${kokhDone ? 'checked' : ''} ${readOnly ? 'disabled' : ''} data-idx="${idx}" data-type="kokh"> KOKH</label>
-          </div>
-        `;
-        weekContainer.appendChild(card);
-        
-        // যদি readOnly না হয় (মেম্বার নিজে) তাহলে চেঞ্জ ইভেন্ট যোগ করি
-        if (!readOnly && !isAdmin) {
-          const chks = card.querySelectorAll('input');
-          chks.forEach(chk => {
-            chk.addEventListener('change', () => {
-              tasks[`${idx}_${chk.dataset.type}`] = chk.checked;
-              db.ref(`users/${currentUser.uid}/tasks`).set(tasks);
-            });
-          });
-        }
+  const totalChapters = 78, totalTasks = 234;
+  const weeks = []; let s=0; [13,13,13,13,13,13].forEach((sz,i)=>{ weeks.push({ id:i+1, label:`Week ${i+1}`, startIdx:s, endIdx:s+sz-1 }); s+=sz; });
+  function defaultTaskState() { let st={}; for(let i=0;i<totalChapters;i++){ st[`${i}_cq`]=false; st[`${i}_mcq`]=false; st[`${i}_kokh`]=false; } return st; }
+  function updateProgress(tasks) { let done=0; for(let i=0;i<totalChapters;i++){ if(tasks[`${i}_cq`]) done++; if(tasks[`${i}_mcq`]) done++; if(tasks[`${i}_kokh`]) done++; } let p=Math.round(done/totalTasks*100); document.getElementById('pgBar').style.width=p+'%'; document.getElementById('pgTxtShort').innerHTML=p+'%'; document.getElementById('totalTaskDisplay').innerHTML=totalTasks; }
+  function renderPlanner(tasks, readOnly) {
+    const container = document.getElementById('plannerContainer'); container.innerHTML=''; if(!tasks) return;
+    for(let w of weeks){ if(activeWeek && activeWeek!==w.id) continue;
+      const weekDiv = document.createElement('div'); weekDiv.className='glass-card p-4 mb-4';
+      weekDiv.innerHTML = `<div class="flex justify-between items-center mb-3"><h3 class="font-bold text-yellow-400">${w.label}</h3><span class="text-sm">${w.endIdx-w.startIdx+1} chapters</span></div><div id="week-${w.id}" class="space-y-3"></div>`;
+      container.appendChild(weekDiv); const sub = weekDiv.querySelector(`#week-${w.id}`);
+      for(let idx=w.startIdx; idx<=w.endIdx; idx++){ const chap = allChapters[idx]; if(currentSubject!=='all' && chap.subject!==currentSubject) continue;
+        const card = document.createElement('div'); card.className='p-3 rounded-xl bg-white/5 border-l-4 border-yellow-500/60';
+        card.innerHTML = `<div class="flex justify-between items-start flex-wrap"><div><span class="text-xs text-white/50">${chap.subject}</span><div class="font-medium">${chap.chapter}</div></div><div class="flex gap-3 mt-2"><label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_cq`]?'checked':''} data-idx="${idx}" data-type="cq" ${readOnly?'disabled':''}> CQ</label><label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_mcq`]?'checked':''} data-idx="${idx}" data-type="mcq" ${readOnly?'disabled':''}> MCQ</label><label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_kokh`]?'checked':''} data-idx="${idx}" data-type="kokh" ${readOnly?'disabled':''}> KOKH</label></div></div>`;
+        sub.appendChild(card);
+        if(!readOnly && !isAdmin){ card.querySelectorAll('input').forEach(inp=>{ inp.addEventListener('change',()=>{ tasks[`${idx}_${inp.dataset.type}`]=inp.checked; db.ref(`users/${currentUser.uid}/tasks`).set(tasks); renderPlanner(tasks,false); if(!document.getElementById('reportSection').classList.contains('hidden')) refreshReport(currentUser.uid, reportWeekOffset); }); }); }
       }
-    }
+    } updateProgress(tasks);
   }
+  async function loadMemberTasks(user) { if(!user) return; const snap=await db.ref(`users/${user.uid}/tasks`).once('value'); let tasks=snap.val()||defaultTaskState(); renderPlanner(tasks,false); await db.ref(`users/${user.uid}/info`).update({ email:user.email, googleName:user.displayName||user.email, lastLogin:Date.now() }); }
 
-  // মেম্বার টাস্ক লোড
-  async function loadMemberTasks(user) {
-    const snap = await db.ref(`users/${user.uid}/tasks`).once('value');
-    let tasks = snap.val() || defaultTasks();
-    renderPlanner(tasks, false, user.displayName || user.email);
-    // ইউজার ইনফো সেভ
-    await db.ref(`users/${user.uid}/info`).set({
-      email: user.email,
-      displayName: user.displayName || user.email,
-      lastLogin: Date.now()
-    });
-  }
+  // ========== RANKING & ADMIN FUNCTIONS ==========
+  function renderRanking(snap) { const users=snap.val()||{}; const list=[]; for(let uid in users){ const info=users[uid].info||{}; const name=info.nickname||info.googleName||info.email||uid.slice(0,8); const mins=info.totalMinutes||0; list.push({name,mins}); } list.sort((a,b)=>b.mins-a.mins); const cont=document.getElementById('rankingList'); if(list.length===0){ cont.innerHTML='<div class="text-center text-white/40 py-6">No users yet</div>'; return; } let html=''; list.forEach((u,idx)=>{ let medal=idx===0?'🥇 ':(idx===1?'🥈 ':(idx===2?'🥉 ':`${idx+1}. `)); html+=`<div class="flex justify-between items-center p-3 glass-card rounded-xl"><div class="flex items-center gap-3"><span class="font-mono w-8">${medal}</span><span class="font-medium">${escapeHtml(u.name)}</span></div><div class="flex items-center gap-2"><span class="text-yellow-400 font-bold">${u.mins}</span><span class="text-xs text-white/50">min</span></div></div>`; }); cont.innerHTML=html; }
+  function escapeHtml(str){ return str.replace(/[&<>]/g,function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+  let rankUnsub=null; function startRanking(){ if(rankUnsub) rankUnsub(); rankUnsub=db.ref('users').on('value',snap=>{ renderRanking(snap); if(isAdmin && document.getElementById('adminUserListContainer').style.display==='block') loadMemberList(); }); } function stopRanking(){ if(rankUnsub){ rankUnsub(); rankUnsub=null; } }
+  async function loadMemberList() { if(!isAdmin) return; const snap=await db.ref('users').once('value'); const users=snap.val()||{}; let html='<table class="w-full text-sm"><thead><tr><th>Name</th><th>Total min</th><th>Tasks done</th><th></th></tr></thead><tbody>'; for(let uid in users){ const info=users[uid].info||{}; const name=info.nickname||info.googleName||info.email||uid; const mins=info.totalMinutes||0; let tasks=users[uid].tasks||{}; let done=0; for(let i=0;i<78;i++){ if(tasks[`${i}_cq`]) done++; if(tasks[`${i}_mcq`]) done++; if(tasks[`${i}_kokh`]) done++; } html+=`<tr><td>${name}</td><td>${mins}</td><td>${done}/234</td><td><button class="view-user-btn bg-yellow-500/20 px-2 py-1 rounded text-xs" data-uid="${uid}">View</button></td></tr>`; } html+='</tbody></table>'; document.getElementById('adminUserListContainer').innerHTML=html; document.querySelectorAll('.view-user-btn').forEach(btn=>{ btn.onclick=()=>{ const uid=btn.getAttribute('data-uid'); viewingUserId=uid; db.ref(`users/${uid}/tasks`).once('value',sn=>renderPlanner(sn.val()||defaultTaskState(),true)); document.getElementById('adminUserListContainer').style.display='none'; document.getElementById('adminBackToListBtn').classList.remove('hidden'); document.getElementById('memberHomeBtn').classList.add('hidden'); document.getElementById('adminStatus').innerHTML=`Viewing: ${uid}`; document.getElementById('plannerSection').classList.remove('hidden'); document.getElementById('timerSection').classList.add('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); }; }); }
+  function backToList() { viewingUserId=null; document.getElementById('adminBackToListBtn').classList.add('hidden'); document.getElementById('memberHomeBtn').classList.remove('hidden'); loadMemberList(); document.getElementById('adminUserListContainer').style.display='block'; document.getElementById('plannerContainer').innerHTML='<div class="text-center text-white/40 py-10">Select a member from the list to view details</div>'; document.getElementById('adminStatus').innerHTML=''; }
 
-  // অ্যাডমিনের জন্য সদস্য লিস্ট লোড
-  async function loadMemberList() {
-    const snap = await db.ref('users').once('value');
-    const users = snap.val() || {};
-    const container = document.getElementById('memberList');
-    if (Object.keys(users).length === 0) {
-      container.innerHTML = '<p class="text-center text-white/40">No members yet.</p>';
-      return;
-    }
-    let html = '<table class="w-full text-sm"><thead><tr class="border-b border-white/20"><th>Name</th><th>Total Minutes</th><th>Tasks Completed</th><th>Action</th></tr></thead><tbody>';
-    for (let uid in users) {
-      const info = users[uid].info || {};
-      const name = info.displayName || info.email || uid.slice(0,8);
-      const totalMins = info.totalMinutes || 0;
-      let tasks = users[uid].tasks || {};
-      let done = 0;
-      for (let i=0; i<totalChapters; i++) {
-        if (tasks[`${i}_cq`]) done++;
-        if (tasks[`${i}_mcq`]) done++;
-        if (tasks[`${i}_kokh`]) done++;
-      }
-      html += `<tr class="border-b border-white/10"><td>${name}</td><td>${totalMins}</td><td>${done}/234</td><td><button class="viewUserBtn bg-yellow-500/30 px-2 py-1 rounded text-xs" data-uid="${uid}" data-name="${name}">View</button></td></tr>`;
-    }
-    html += '</tbody></table>';
-    container.innerHTML = html;
-    // View বাটনে ক্লিক ইভেন্ট
-    document.querySelectorAll('.viewUserBtn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const uid = btn.getAttribute('data-uid');
-        const name = btn.getAttribute('data-name');
-        viewingUserId = uid;
-        const tasksSnap = await db.ref(`users/${uid}/tasks`).once('value');
-        const tasks = tasksSnap.val() || defaultTasks();
-        renderPlanner(tasks, true, name);
-        document.getElementById('plannerView').classList.remove('hidden');
-        document.getElementById('memberList').classList.add('hidden');
-      });
-    });
-  }
-
-  // ---------- লগইন কন্ট্রোল ----------
-  document.getElementById('role').addEventListener('change', (e) => {
-    const isAdminRole = e.target.value === 'admin';
-    document.getElementById('memberLoginDiv').classList.toggle('hidden', isAdminRole);
-    document.getElementById('adminLoginDiv').classList.toggle('hidden', !isAdminRole);
-  });
-
-  // গুগল লগইন
-  document.getElementById('googleBtn').onclick = () => {
-    auth.signInWithPopup(provider).then(async (result) => {
-      currentUser = result.user;
-      isAdmin = false;
-      document.getElementById('loginBox').classList.add('hidden');
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('plannerView').classList.remove('hidden');
-      document.getElementById('userInfo').innerHTML = `<span>👋 ${currentUser.displayName}</span><button id="logoutBtn" class="bg-white/10 px-3 py-1 rounded-full text-sm">Logout</button>`;
-      document.getElementById('logoutBtn').onclick = () => auth.signOut();
-      await loadMemberTasks(currentUser);
-    }).catch(err => alert(err.message));
-  };
-
-  // অ্যাডমিন লগইন
-  document.getElementById('adminLoginBtn').onclick = () => {
-    const pwd = document.getElementById('adminPwd').value;
-    if (pwd === 'dormant2025') {
-      isAdmin = true;
-      currentUser = null;
-      document.getElementById('loginBox').classList.add('hidden');
-      document.getElementById('adminPanel').classList.remove('hidden');
-      document.getElementById('plannerView').classList.add('hidden');
-      document.getElementById('userInfo').innerHTML = `<span>👑 Admin</span><button id="adminLogoutBtn" class="bg-white/10 px-3 py-1 rounded-full text-sm">Logout</button>`;
-      document.getElementById('adminLogoutBtn').onclick = () => { location.reload(); };
-      loadMemberList();
-      document.getElementById('memberList').classList.remove('hidden');
-    } else {
-      alert('Wrong password');
-    }
-  };
-
-  // অ্যাডমিন প্যানেলের বাটন
-  document.getElementById('showMembersBtn').onclick = () => {
-    loadMemberList();
-    document.getElementById('memberList').classList.remove('hidden');
-    document.getElementById('plannerView').classList.add('hidden');
-  };
-  document.getElementById('exportBtn').onclick = () => {
-    db.ref('users').once('value', snap => {
-      const data = snap.val() || {};
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `users_${Date.now()}.json`;
-      a.click();
-    });
-  };
-  document.getElementById('closePlannerBtn').onclick = () => {
-    if (isAdmin) {
-      document.getElementById('plannerView').classList.add('hidden');
-      document.getElementById('memberList').classList.remove('hidden');
-    } else {
-      // মেম্বার প্ল্যানার বন্ধ করলে লগইন প্যানেলে ফিরে যেতে পারে
-      auth.signOut();
-    }
-  };
-
-  // লগআউট স্টেট
-  auth.onAuthStateChanged(user => {
-    if (!user && !isAdmin) {
-      document.getElementById('loginBox').classList.remove('hidden');
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('plannerView').classList.add('hidden');
-      document.getElementById('userInfo').innerHTML = '';
-    }
-  });
+  // ========== UI EVENT LISTENERS ==========
+  document.getElementById('showPlannerBtn').onclick=()=>{ document.getElementById('timerSection').classList.add('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); document.getElementById('plannerSection').classList.remove('hidden'); if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value',sn=>renderPlanner(sn.val()||defaultTaskState(),true)); else document.getElementById('plannerContainer').innerHTML='<div class="text-center text-white/40 py-10">No user selected. Go to Members list and click View.</div>'; };
+  document.getElementById('showTimerBtn').onclick=()=>{ document.getElementById('plannerSection').classList.add('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); document.getElementById('timerSection').classList.remove('hidden'); };
+  document.getElementById('showRankingBtn').onclick=()=>{ document.getElementById('plannerSection').classList.add('hidden'); document.getElementById('timerSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); document.getElementById('rankingSection').classList.remove('hidden'); };
+  document.getElementById('showReportBtn').onclick=()=>{ document.getElementById('plannerSection').classList.add('hidden'); document.getElementById('timerSection').classList.add('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('reportSection').classList.remove('hidden'); if(currentUser && !isAdmin) refreshReport(currentUser.uid, reportWeekOffset); };
+  document.getElementById('prevWeekBtn').onclick=()=>{ reportWeekOffset++; if(currentUser && !isAdmin) refreshReport(currentUser.uid, reportWeekOffset); };
+  document.getElementById('nextWeekBtn').onclick=()=>{ reportWeekOffset--; if(currentUser && !isAdmin) refreshReport(currentUser.uid, reportWeekOffset); };
+  document.getElementById('currentWeekBtn').onclick=()=>{ reportWeekOffset=0; if(currentUser && !isAdmin) refreshReport(currentUser.uid, reportWeekOffset); };
+  document.getElementById('googleSignInBtn').onclick=()=>auth.signInWithPopup(provider);
+  document.getElementById('adminLoginBtn').onclick=()=>{ const pwd=document.getElementById('adminPassword').value; if(pwd==='dormant2025'){ isAdmin=true; currentUser=null; document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); document.getElementById('userStatusArea').innerHTML='<span class="text-sm">👑 Admin</span><button id="adminLogout" class="text-xs bg-white/10 px-3 py-1 rounded-full">Logout</button>'; document.getElementById('adminLogout').onclick=()=>{ isAdmin=false; location.reload(); }; startRanking(); document.getElementById('timerSection').classList.remove('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('plannerSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); loadMemberList(); document.getElementById('adminUserListContainer').style.display='block'; document.getElementById('plannerContainer').innerHTML='<div class="text-center text-white/40 py-10">Select a member from the list to view details</div>'; } else alert('Wrong password'); };
+  auth.onAuthStateChanged(async (user)=>{ if(user && !isAdmin){ currentUser=user; isAdmin=false; document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('adminPanel').classList.add('hidden'); document.getElementById('userStatusArea').innerHTML=`<div class="flex items-center gap-2"><span class="text-sm">👋 ${user.displayName||user.email}</span><button id="userLogout" class="text-xs bg-white/10 px-3 py-1 rounded-full">Logout</button><button id="editNicknameBtn" class="text-xs bg-yellow-500/20 px-3 py-1 rounded-full">✏️ Name</button></div>`; document.getElementById('userLogout').onclick=()=>auth.signOut(); document.getElementById('editNicknameBtn').onclick=async()=>{ const newNick=prompt('Enter your display name:'); if(newNick) await db.ref(`users/${currentUser.uid}/info`).update({ nickname:newNick }); }; await loadMemberTasks(user); startRanking(); document.getElementById('timerSection').classList.remove('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('plannerSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); } else if(!user && !isAdmin){ document.getElementById('loginPanel').classList.remove('hidden'); document.getElementById('userStatusArea').innerHTML=''; stopRanking(); } });
+  document.getElementById('startTimerBtn').onclick=startTimer; document.getElementById('pauseTimerBtn').onclick=()=>{ if(timerInterval) clearInterval(timerInterval); timerInterval=null; }; document.getElementById('resetTimerBtn').onclick=resetTimerUI;
+  document.querySelectorAll('.session-tab').forEach(btn=>btn.onclick=()=>switchSession(btn.dataset.session));
+  document.getElementById('openSettingsBtn').onclick=()=>document.getElementById('settingsModal').classList.remove('hidden');
+  document.getElementById('closeSettingsBtn').onclick=()=>document.getElementById('settingsModal').classList.add('hidden');
+  document.getElementById('saveSettingsBtn').onclick=()=>{ settings.focus=+document.getElementById('focusDuration').value; settings.shortBreak=+document.getElementById('shortBreakDuration').value; settings.longBreak=+document.getElementById('longBreakDuration').value; saveSettings(); resetTimerUI(); document.getElementById('settingsModal').classList.add('hidden'); };
+  document.getElementById('exportAllDataBtn').onclick=()=>{ db.ref('users').once('value',snap=>{ const blob=new Blob([JSON.stringify(snap.val(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`data_${Date.now()}.json`; a.click(); }); };
+  document.getElementById('memberListBtn').onclick=()=>{ loadMemberList(); document.getElementById('adminUserListContainer').style.display='block'; document.getElementById('plannerContainer').innerHTML='<div class="text-center text-white/40 py-10">Select a member from the list to view details</div>'; document.getElementById('adminBackToListBtn').classList.add('hidden'); viewingUserId=null; };
+  document.getElementById('homeBtn').onclick=()=>{ document.getElementById('adminUserListContainer').style.display='none'; };
+  document.getElementById('memberHomeBtn').onclick=()=>{ if(currentUser) loadMemberTasks(currentUser); };
+  document.getElementById('adminBackToListBtn').onclick=backToList;
+  document.getElementById('downloadBtn').onclick=()=>{ const html=document.documentElement.outerHTML; const blob=new Blob([html],{type:'text/html'}); const a=document.createElement('a'); a.download='dormant_beast.html'; a.href=URL.createObjectURL(blob); a.click(); };
+  function buildWeekButtons(){ const cont=document.getElementById('weekButtons'); cont.innerHTML=''; const all=document.createElement('button'); all.className='bg-yellow-500/30 px-3 py-1 rounded-full text-sm mr-1'; all.innerText='All weeks'; all.onclick=()=>{ activeWeek=null; if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value',sn=>renderPlanner(sn.val()||defaultTaskState(),true)); }; cont.appendChild(all); weeks.forEach(w=>{ const btn=document.createElement('button'); btn.className='bg-white/10 px-3 py-1 rounded-full text-sm hover:bg-white/20'; btn.innerText=w.label; btn.onclick=()=>{ activeWeek=(activeWeek===w.id)?null:w.id; if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value',sn=>renderPlanner(sn.val()||defaultTaskState(),true)); }; cont.appendChild(btn); }); }
+  buildWeekButtons(); document.getElementById('subjectFilter').onchange=(e)=>{ currentSubject=e.target.value; if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value',sn=>renderPlanner(sn.val()||defaultTaskState(),true)); };
+  loadSettings(); resetTimerUI(); renderHistory(); updateStats(); startRanking();
+  document.getElementById('timerSection').classList.remove('hidden');
 </script>
 </body>
 </html>
