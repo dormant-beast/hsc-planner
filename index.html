@@ -156,8 +156,27 @@
 
   <!-- Planner Section (78 chapters, 6 weeks) -->
   <div id="plannerSection" class="hidden">
-    <div class="glass-card p-6 mb-6 text-center"><div class="flex justify-between items-center flex-wrap gap-2"><div><span class="text-sm text-white/60">Total tasks</span><div class="text-2xl font-bold" id="totalTaskDisplay">0</div></div><div><span class="text-sm text-white/60">Completed</span><div class="text-2xl font-bold text-yellow-400" id="pgTxtShort">0%</div></div><div class="flex-1 max-w-md"><div class="h-2 bg-white/10 rounded-full overflow-hidden"><div id="pgBar" class="h-full bg-gradient-to-r from-yellow-500 to-amber-500 w-0 transition-all"></div></div></div></div></div>
-    <div class="flex flex-wrap gap-3 mb-6"><select id="subjectFilter" class="bg-black/30 border border-white/20 rounded-full px-4 py-2 text-sm"><option value="all">All subjects</option><option value="পদার্থবিজ্ঞান ১ম পত্র">Physics 1st</option><option value="পদার্থবিজ্ঞান ২য় পত্র">Physics 2nd</option><option value="রসায়ন ১ম পত্র">Chemistry 1st</option><option value="রসায়ন ২য় পত্র">Chemistry 2nd</option><option value="জীববিজ্ঞান ১ম পত্র">Biology 1st</option><option value="জীববিজ্ঞান ২য় পত্র">Biology 2nd</option><option value="উচ্চতর গণিত ১ম পত্র">Higher Math 1st</option><option value="উচ্চতর গণিত ২য় পত্র">Higher Math 2nd</option><option value="তথ্য ও যোগাযোগ প্রযুক্তি">ICT</option></select><div id="weekButtons" class="flex flex-wrap gap-2"></div><button id="memberHomeBtn" class="ml-auto bg-yellow-500/20 px-4 py-2 rounded-full text-sm hidden">🏠 Home</button></div>
+    <div class="glass-card p-6 mb-6 text-center">
+      <div class="flex justify-between items-center flex-wrap gap-2">
+        <div><span class="text-sm text-white/60">Total tasks</span><div class="text-2xl font-bold" id="totalTaskDisplay">0</div></div>
+        <div><span class="text-sm text-white/60">Completed</span><div class="text-2xl font-bold text-yellow-400" id="pgTxtShort">0%</div></div>
+        <div class="flex-1 max-w-md"><div class="h-2 bg-white/10 rounded-full overflow-hidden"><div id="pgBar" class="h-full bg-gradient-to-r from-yellow-500 to-amber-500 w-0 transition-all"></div></div></div>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-3 mb-6">
+      <select id="subjectFilter" class="bg-black/30 border border-white/20 rounded-full px-4 py-2 text-sm">
+        <option value="all">All subjects</option>
+        <option value="পদার্থবিজ্ঞান ১ম পত্র">Physics 1st</option><option value="পদার্থবিজ্ঞান ২য় পত্র">Physics 2nd</option>
+        <option value="রসায়ন ১ম পত্র">Chemistry 1st</option><option value="রসায়ন ২য় পত্র">Chemistry 2nd</option>
+        <option value="জীববিজ্ঞান ১ম পত্র">Biology 1st</option><option value="জীববিজ্ঞান ২য় পত্র">Biology 2nd</option>
+        <option value="উচ্চতর গণিত ১ম পত্র">Higher Math 1st</option><option value="উচ্চতর গণিত ২য় পত্র">Higher Math 2nd</option>
+        <option value="তথ্য ও যোগাযোগ প্রযুক্তি">ICT</option>
+      </select>
+      <div id="weekButtons" class="flex flex-wrap gap-2"></div>
+      <button id="memberHomeBtn" class="ml-auto bg-yellow-500/20 px-4 py-2 rounded-full text-sm hidden">🏠 Home</button>
+      <!-- Back to list button for admin -->
+      <button id="adminBackToListBtn" class="ml-2 bg-white/10 px-4 py-2 rounded-full text-sm hidden">◀ Back to Members</button>
+    </div>
     <div id="plannerContainer" class="space-y-6"></div>
   </div>
 
@@ -183,7 +202,7 @@
   // ---------- Global variables ----------
   let currentUser = null;
   let isAdmin = false;
-  let viewingUserId = null;
+  let viewingUserId = null;      // UID of user being viewed by admin
   let activeWeek = null, currentSubject = 'all';
 
   // Pomodoro variables
@@ -194,10 +213,10 @@
   let settings = { focus: 25, shortBreak: 5, longBreak: 15 };
   let sessionHistory = [];
 
-  // Weekly report offset (0 = current week)
+  // Weekly report offset
   let reportWeekOffset = 0;
 
-  // ---------- Weekly report functions ----------
+  // ---------- Weekly report functions (unchanged) ----------
   async function saveFocusMinutesToWeekly(uid, minutes) {
     const now = new Date();
     const dayOfWeek = now.getDay();
@@ -283,7 +302,7 @@
     renderReport(report);
   }
 
-  // ---------- Pomodoro functions ----------
+  // ---------- Pomodoro functions (unchanged) ----------
   function loadSettings() { const s = localStorage.getItem('pomodoro_settings'); if(s) settings = { ...settings, ...JSON.parse(s) }; document.getElementById('focusDuration').value = settings.focus; document.getElementById('shortBreakDuration').value = settings.shortBreak; document.getElementById('longBreakDuration').value = settings.longBreak; }
   function saveSettings() { localStorage.setItem('pomodoro_settings', JSON.stringify(settings)); resetTimerUI(); }
   const savedHistory = localStorage.getItem('pomodoro_history'); if(savedHistory) sessionHistory = JSON.parse(savedHistory); else sessionHistory = [];
@@ -315,17 +334,135 @@
   const weeks = []; let startIdx=0; [13,13,13,13,13,13].forEach((size,i)=>{ weeks.push({ id:i+1, label:`Week ${i+1}`, startIdx, endIdx:startIdx+size-1, color:`hsl(${200+(i+1)*25},70%,55%)` }); startIdx+=size; });
   function defaultTaskState() { let s={}; for(let i=0;i<totalChapters;i++){ s[`${i}_cq`]=false; s[`${i}_mcq`]=false; s[`${i}_kokh`]=false; } return s; }
   function updateProgress(tasks) { let done=0; for(let i=0;i<totalChapters;i++){ if(tasks[`${i}_cq`]) done++; if(tasks[`${i}_mcq`]) done++; if(tasks[`${i}_kokh`]) done++; } let p=Math.round((done/totalTasks)*100); document.getElementById('pgBar').style.width=p+'%'; document.getElementById('pgTxtShort').innerHTML=p+'%'; document.getElementById('totalTaskDisplay').innerHTML=totalTasks; }
-  function renderPlanner(tasks, readOnly) { const container=document.getElementById('plannerContainer'); container.innerHTML=''; if(!tasks) return; for(let week of weeks){ if(activeWeek && activeWeek!==week.id) continue; const weekDiv=document.createElement('div'); weekDiv.className='glass-card p-4 mb-4'; weekDiv.innerHTML=`<div class="flex justify-between items-center mb-3"><h3 class="font-bold text-yellow-400">${week.label}</h3><span class="text-sm">${week.endIdx-week.startIdx+1} chapters</span></div><div id="week-${week.id}" class="space-y-3"></div>`; container.appendChild(weekDiv); const subDiv=weekDiv.querySelector(`#week-${week.id}`); for(let idx=week.startIdx; idx<=week.endIdx; idx++){ const chap=allChapters[idx]; if(currentSubject!=='all' && chap.subject!==currentSubject) continue; const card=document.createElement('div'); card.className='p-3 rounded-xl bg-white/5 border-l-4 border-yellow-500/60'; card.innerHTML=`<div class="flex justify-between items-start flex-wrap"><div><span class="text-xs text-white/50">${chap.subject}</span><div class="font-medium">${chap.chapter}</div></div><div class="flex gap-3 mt-2"><label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_cq`]?'checked':''} data-idx="${idx}" data-type="cq" ${readOnly?'disabled':''}> CQ</label><label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_mcq`]?'checked':''} data-idx="${idx}" data-type="mcq" ${readOnly?'disabled':''}> MCQ</label><label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_kokh`]?'checked':''} data-idx="${idx}" data-type="kokh" ${readOnly?'disabled':''}> KOKH</label></div></div>`; subDiv.appendChild(card); if(!readOnly && !isAdmin){ card.querySelectorAll('input').forEach(inp=>{ inp.addEventListener('change',()=>{ tasks[`${idx}_${inp.dataset.type}`]=inp.checked; db.ref(`users/${currentUser.uid}/tasks`).set(tasks); renderPlanner(tasks,false); if(document.getElementById('reportSection').classList.contains('hidden')===false) refreshReport(currentUser.uid, reportWeekOffset); }); }); } } } updateProgress(tasks); }
-  async function loadMemberTasks(user) { if(!user) return; const snap=await db.ref(`users/${user.uid}/tasks`).once('value'); let tasks=snap.val()||defaultTaskState(); renderPlanner(tasks,false); await db.ref(`users/${user.uid}/info`).update({ email:user.email, googleName:user.displayName||user.email, lastLogin:Date.now() }); }
+  
+  function renderPlanner(tasks, readOnly) {
+    const container = document.getElementById('plannerContainer');
+    container.innerHTML = '';
+    if (!tasks) return;
+    for (let week of weeks) {
+      if (activeWeek && activeWeek !== week.id) continue;
+      const weekDiv = document.createElement('div');
+      weekDiv.className = 'glass-card p-4 mb-4';
+      weekDiv.innerHTML = `<div class="flex justify-between items-center mb-3"><h3 class="font-bold text-yellow-400">${week.label}</h3><span class="text-sm">${week.endIdx-week.startIdx+1} chapters</span></div><div id="week-${week.id}" class="space-y-3"></div>`;
+      container.appendChild(weekDiv);
+      const subDiv = weekDiv.querySelector(`#week-${week.id}`);
+      for (let idx=week.startIdx; idx<=week.endIdx; idx++) {
+        const chap = allChapters[idx];
+        if (currentSubject !== 'all' && chap.subject !== currentSubject) continue;
+        const card = document.createElement('div');
+        card.className = 'p-3 rounded-xl bg-white/5 border-l-4 border-yellow-500/60';
+        card.innerHTML = `
+          <div class="flex justify-between items-start flex-wrap">
+            <div><span class="text-xs text-white/50">${chap.subject}</span><div class="font-medium">${chap.chapter}</div></div>
+            <div class="flex gap-3 mt-2">
+              <label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_cq`] ? 'checked' : ''} data-idx="${idx}" data-type="cq" ${readOnly ? 'disabled' : ''}> CQ</label>
+              <label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_mcq`] ? 'checked' : ''} data-idx="${idx}" data-type="mcq" ${readOnly ? 'disabled' : ''}> MCQ</label>
+              <label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_kokh`] ? 'checked' : ''} data-idx="${idx}" data-type="kokh" ${readOnly ? 'disabled' : ''}> KOKH</label>
+            </div>
+          </div>
+        `;
+        subDiv.appendChild(card);
+        if (!readOnly && !isAdmin) {
+          card.querySelectorAll('input').forEach(inp => {
+            inp.addEventListener('change', () => {
+              tasks[`${idx}_${inp.dataset.type}`] = inp.checked;
+              db.ref(`users/${currentUser.uid}/tasks`).set(tasks);
+              renderPlanner(tasks, false);
+              if (document.getElementById('reportSection').classList.contains('hidden')===false) refreshReport(currentUser.uid, reportWeekOffset);
+            });
+          });
+        }
+      }
+    }
+    updateProgress(tasks);
+  }
+
+  async function loadMemberTasks(user) {
+    if (!user) return;
+    const snap = await db.ref(`users/${user.uid}/tasks`).once('value');
+    let tasks = snap.val() || defaultTaskState();
+    renderPlanner(tasks, false);
+    await db.ref(`users/${user.uid}/info`).update({ email: user.email, googleName: user.displayName || user.email, lastLogin: Date.now() });
+  }
+
+  // Admin view: show user tasks in read-only mode and switch to planner
+  async function adminViewUser(uid) {
+    viewingUserId = uid;
+    const snap = await db.ref(`users/${uid}/tasks`).once('value');
+    const tasks = snap.val() || defaultTaskState();
+    renderPlanner(tasks, true);   // readOnly = true
+    // Switch to planner section
+    document.getElementById('timerSection').classList.add('hidden');
+    document.getElementById('rankingSection').classList.add('hidden');
+    document.getElementById('reportSection').classList.add('hidden');
+    document.getElementById('plannerSection').classList.remove('hidden');
+    // Show back button
+    document.getElementById('adminBackToListBtn').classList.remove('hidden');
+    document.getElementById('memberHomeBtn').classList.add('hidden'); // hide member home
+    document.getElementById('adminStatus').innerHTML = `Viewing: ${uid}`;
+  }
+
+  // Back to member list (admin)
+  function backToMemberList() {
+    viewingUserId = null;
+    document.getElementById('adminBackToListBtn').classList.add('hidden');
+    document.getElementById('memberHomeBtn').classList.remove('hidden'); // restore if needed
+    loadAllUsersAndRenderList();
+    document.getElementById('adminUserListContainer').style.display = 'block';
+    document.getElementById('plannerContainer').innerHTML = '<div class="text-center text-white/40 py-10">Select a member from the list to view details</div>';
+    document.getElementById('adminStatus').innerHTML = '';
+  }
 
   // Ranking and admin functions
   function renderRanking(usersSnap) { const users=usersSnap.val()||{}; const list=[]; for(let uid in users){ const info=users[uid].info||{}; const name=info.nickname||info.googleName||info.email||uid.slice(0,8); const minutes=info.totalMinutes||0; list.push({name,minutes}); } list.sort((a,b)=>b.minutes-a.minutes); const container=document.getElementById('rankingList'); if(list.length===0){ container.innerHTML='<div class="text-center text-white/40 py-6">No users yet</div>'; return; } let html=''; list.forEach((u,idx)=>{ let medal=idx===0?'🥇 ':(idx===1?'🥈 ':(idx===2?'🥉 ':`${idx+1}. `)); html+=`<div class="flex justify-between items-center p-3 glass-card rounded-xl"><div class="flex items-center gap-3"><span class="font-mono w-8">${medal}</span><span class="font-medium">${escapeHtml(u.name)}</span></div><div class="flex items-center gap-2"><span class="text-yellow-400 font-bold">${u.minutes}</span><span class="text-xs text-white/50">min</span></div></div>`; }); container.innerHTML=html; }
   function escapeHtml(str){ return str.replace(/[&<>]/g,function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
   let rankingUnsub=null; function startRankingListener(){ if(rankingUnsub) rankingUnsub(); rankingUnsub=db.ref('users').on('value',(snap)=>{ renderRanking(snap); if(isAdmin && document.getElementById('adminUserListContainer').style.display==='block') loadAllUsersAndRenderList(); }); } function stopRankingListener(){ if(rankingUnsub){ rankingUnsub(); rankingUnsub=null; } }
-  function loadAllUsersAndRenderList(){ if(!isAdmin) return; db.ref('users').once('value',snap=>{ const users=snap.val()||{}; let html='<table class="w-full text-sm"><thead><tr><th>Name</th><th>Total minutes</th><th>Tasks done</th><th></th></tr></thead><tbody>'; for(let uid in users){ const info=users[uid].info||{}; const name=info.nickname||info.googleName||info.email||uid; const minutes=info.totalMinutes||0; let tasks=users[uid].tasks||{}; let done=0; for(let i=0;i<totalChapters;i++){ if(tasks[`${i}_cq`]) done++; if(tasks[`${i}_mcq`]) done++; if(tasks[`${i}_kokh`]) done++; } html+=`<tr><td>${name}</td><td>${minutes}</td><td>${done}/${totalTasks}</td><td><button class="view-user-btn bg-yellow-500/20 px-2 py-1 rounded text-xs" data-uid="${uid}">View</button></td></tr>`; } html+='</tbody></table>'; document.getElementById('adminUserListContainer').innerHTML=html; document.querySelectorAll('.view-user-btn').forEach(btn=>{ btn.onclick=()=>{ viewingUserId=btn.dataset.uid; db.ref(`users/${viewingUserId}/tasks`).once('value',s=>renderPlanner(s.val()||defaultTaskState(),true)); document.getElementById('adminStatus').innerHTML=`Viewing: ${viewingUserId}`; }; }); }); }
+  
+  function loadAllUsersAndRenderList() {
+    if (!isAdmin) return;
+    db.ref('users').once('value', snap => {
+      const users = snap.val() || {};
+      let html = '<table class="w-full text-sm"><thead><tr><th>Name</th><th>Total minutes</th><th>Tasks done</th><th></th></tr></thead><tbody>';
+      for (let uid in users) {
+        const info = users[uid].info || {};
+        const name = info.nickname || info.googleName || info.email || uid;
+        const minutes = info.totalMinutes || 0;
+        let tasks = users[uid].tasks || {};
+        let done = 0;
+        for (let i=0; i<totalChapters; i++) {
+          if (tasks[`${i}_cq`]) done++;
+          if (tasks[`${i}_mcq`]) done++;
+          if (tasks[`${i}_kokh`]) done++;
+        }
+        html += `<tr><td>${name}</td><td>${minutes}</td><td>${done}/${totalTasks}</td><td><button class="view-user-btn bg-yellow-500/20 px-2 py-1 rounded text-xs" data-uid="${uid}">View</button></td></tr>`;
+      }
+      html += '</tbody></table>';
+      document.getElementById('adminUserListContainer').innerHTML = html;
+      document.querySelectorAll('.view-user-btn').forEach(btn => {
+        btn.onclick = () => {
+          const uid = btn.getAttribute('data-uid');
+          adminViewUser(uid);
+          document.getElementById('adminUserListContainer').style.display = 'none';
+        };
+      });
+    });
+  }
 
   // UI event listeners
-  document.getElementById('showPlannerBtn').onclick=()=>{ document.getElementById('timerSection').classList.add('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); document.getElementById('plannerSection').classList.remove('hidden'); if(currentUser && !isAdmin) loadMemberTasks(currentUser); };
+  document.getElementById('showPlannerBtn').onclick=()=>{
+    document.getElementById('timerSection').classList.add('hidden');
+    document.getElementById('rankingSection').classList.add('hidden');
+    document.getElementById('reportSection').classList.add('hidden');
+    document.getElementById('plannerSection').classList.remove('hidden');
+    if(currentUser && !isAdmin) loadMemberTasks(currentUser);
+    else if(isAdmin && viewingUserId) {
+      // re-load the viewed user tasks
+      db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val() || defaultTaskState(), true));
+    } else {
+      // admin not viewing anyone, show message
+      document.getElementById('plannerContainer').innerHTML = '<div class="text-center text-white/40 py-10">No user selected. Go to Members list and click View.</div>';
+    }
+  };
   document.getElementById('showTimerBtn').onclick=()=>{ document.getElementById('plannerSection').classList.add('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); document.getElementById('timerSection').classList.remove('hidden'); };
   document.getElementById('showRankingBtn').onclick=()=>{ document.getElementById('plannerSection').classList.add('hidden'); document.getElementById('timerSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); document.getElementById('rankingSection').classList.remove('hidden'); };
   document.getElementById('showReportBtn').onclick=()=>{ document.getElementById('plannerSection').classList.add('hidden'); document.getElementById('timerSection').classList.add('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('reportSection').classList.remove('hidden'); if(currentUser && !isAdmin) refreshReport(currentUser.uid, reportWeekOffset); };
@@ -333,7 +470,7 @@
   document.getElementById('nextWeekBtn').onclick=()=>{ reportWeekOffset--; if(currentUser && !isAdmin) refreshReport(currentUser.uid, reportWeekOffset); };
   document.getElementById('currentWeekBtn').onclick=()=>{ reportWeekOffset=0; if(currentUser && !isAdmin) refreshReport(currentUser.uid, reportWeekOffset); };
   document.getElementById('googleSignInBtn').onclick=()=>auth.signInWithPopup(provider);
-  document.getElementById('adminLoginBtn').onclick=()=>{ const pwd=document.getElementById('adminPassword').value; if(pwd==='dormant2025'){ isAdmin=true; currentUser=null; document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); document.getElementById('userStatusArea').innerHTML='<span class="text-sm">👑 Admin</span><button id="adminLogout" class="text-xs bg-white/10 px-3 py-1 rounded-full">Logout</button>'; document.getElementById('adminLogout').onclick=()=>{ isAdmin=false; location.reload(); }; startRankingListener(); document.getElementById('timerSection').classList.remove('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('plannerSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); } else alert('Wrong password'); };
+  document.getElementById('adminLoginBtn').onclick=()=>{ const pwd=document.getElementById('adminPassword').value; if(pwd==='dormant2025'){ isAdmin=true; currentUser=null; document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); document.getElementById('userStatusArea').innerHTML='<span class="text-sm">👑 Admin</span><button id="adminLogout" class="text-xs bg-white/10 px-3 py-1 rounded-full">Logout</button>'; document.getElementById('adminLogout').onclick=()=>{ isAdmin=false; location.reload(); }; startRankingListener(); document.getElementById('timerSection').classList.remove('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('plannerSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); document.getElementById('adminUserListContainer').style.display = 'block'; loadAllUsersAndRenderList(); document.getElementById('plannerContainer').innerHTML = '<div class="text-center text-white/40 py-10">Select a member from the list to view details</div>'; } else alert('Wrong password'); };
   auth.onAuthStateChanged(async (user)=>{ if(user && !isAdmin){ currentUser=user; isAdmin=false; document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('adminPanel').classList.add('hidden'); document.getElementById('userStatusArea').innerHTML=`<div class="flex items-center gap-2"><span class="text-sm">👋 ${user.displayName||user.email}</span><button id="userLogout" class="text-xs bg-white/10 px-3 py-1 rounded-full">Logout</button><button id="editNicknameBtn" class="text-xs bg-yellow-500/20 px-3 py-1 rounded-full">✏️ Name</button></div>`; document.getElementById('userLogout').onclick=()=>auth.signOut(); document.getElementById('editNicknameBtn').onclick=async()=>{ const newNick=prompt('Enter your display name:'); if(newNick) await db.ref(`users/${currentUser.uid}/info`).update({ nickname:newNick }); }; await loadMemberTasks(user); startRankingListener(); document.getElementById('timerSection').classList.remove('hidden'); document.getElementById('rankingSection').classList.add('hidden'); document.getElementById('plannerSection').classList.add('hidden'); document.getElementById('reportSection').classList.add('hidden'); } else if(!user && !isAdmin){ document.getElementById('loginPanel').classList.remove('hidden'); document.getElementById('userStatusArea').innerHTML=''; stopRankingListener(); } });
   document.getElementById('startTimerBtn').onclick=startTimer; document.getElementById('pauseTimerBtn').onclick=()=>{ if(timerInterval) clearInterval(timerInterval); timerInterval=null; }; document.getElementById('resetTimerBtn').onclick=resetTimerUI;
   document.querySelectorAll('.session-tab').forEach(btn=>btn.onclick=()=>switchSession(btn.dataset.session));
@@ -341,12 +478,13 @@
   document.getElementById('closeSettingsBtn').onclick=()=>document.getElementById('settingsModal').classList.add('hidden');
   document.getElementById('saveSettingsBtn').onclick=()=>{ settings.focus=+document.getElementById('focusDuration').value; settings.shortBreak=+document.getElementById('shortBreakDuration').value; settings.longBreak=+document.getElementById('longBreakDuration').value; saveSettings(); resetTimerUI(); document.getElementById('settingsModal').classList.add('hidden'); };
   document.getElementById('exportAllDataBtn').onclick=()=>{ db.ref('users').once('value',snap=>{ const blob=new Blob([JSON.stringify(snap.val(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`dormantbeast_data_${Date.now()}.json`; a.click(); }); };
-  document.getElementById('memberListBtn').onclick=()=>{ loadAllUsersAndRenderList(); document.getElementById('adminUserListContainer').style.display='block'; };
-  document.getElementById('homeBtn').onclick=()=>document.getElementById('adminUserListContainer').style.display='none';
+  document.getElementById('memberListBtn').onclick=()=>{ loadAllUsersAndRenderList(); document.getElementById('adminUserListContainer').style.display='block'; document.getElementById('plannerContainer').innerHTML = '<div class="text-center text-white/40 py-10">Select a member from the list to view details</div>'; document.getElementById('adminBackToListBtn').classList.add('hidden'); viewingUserId = null; };
+  document.getElementById('homeBtn').onclick=()=>{ document.getElementById('adminUserListContainer').style.display='none'; document.getElementById('plannerContainer').innerHTML = '<div class="text-center text-white/40 py-10">Use Members button to see list</div>'; };
   document.getElementById('memberHomeBtn').onclick=()=>{ if(currentUser) loadMemberTasks(currentUser); };
+  document.getElementById('adminBackToListBtn').onclick=backToMemberList;
   document.getElementById('downloadBtn').onclick=()=>{ const html=document.documentElement.outerHTML; const blob=new Blob([html],{type:'text/html'}); const a=document.createElement('a'); a.download='dormant_beast_planner.html'; a.href=URL.createObjectURL(blob); a.click(); };
-  function buildWeekButtons(){ const cont=document.getElementById('weekButtons'); cont.innerHTML=''; const allBtn=document.createElement('button'); allBtn.className='bg-yellow-500/30 px-3 py-1 rounded-full text-sm mr-1'; allBtn.innerText='All weeks'; allBtn.onclick=()=>{ activeWeek=null; if(currentUser && !isAdmin) loadMemberTasks(currentUser); }; cont.appendChild(allBtn); weeks.forEach(w=>{ const btn=document.createElement('button'); btn.className='bg-white/10 px-3 py-1 rounded-full text-sm hover:bg-white/20'; btn.innerText=w.label; btn.onclick=()=>{ activeWeek=(activeWeek===w.id)?null:w.id; if(currentUser && !isAdmin) loadMemberTasks(currentUser); }; cont.appendChild(btn); }); }
-  buildWeekButtons(); document.getElementById('subjectFilter').onchange=(e)=>{ currentSubject=e.target.value; if(currentUser && !isAdmin) loadMemberTasks(currentUser); };
+  function buildWeekButtons(){ const cont=document.getElementById('weekButtons'); cont.innerHTML=''; const allBtn=document.createElement('button'); allBtn.className='bg-yellow-500/30 px-3 py-1 rounded-full text-sm mr-1'; allBtn.innerText='All weeks'; allBtn.onclick=()=>{ activeWeek=null; if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val() || defaultTaskState(), true)); }; cont.appendChild(allBtn); weeks.forEach(w=>{ const btn=document.createElement('button'); btn.className='bg-white/10 px-3 py-1 rounded-full text-sm hover:bg-white/20'; btn.innerText=w.label; btn.onclick=()=>{ activeWeek=(activeWeek===w.id)?null:w.id; if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val() || defaultTaskState(), true)); }; cont.appendChild(btn); }); }
+  buildWeekButtons(); document.getElementById('subjectFilter').onchange=(e)=>{ currentSubject=e.target.value; if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val() || defaultTaskState(), true)); };
   loadSettings(); resetTimerUI(); renderHistory(); updateStats(); startRankingListener();
   document.getElementById('timerSection').classList.remove('hidden');
 </script>
