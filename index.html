@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>HSC প্ল্যানার | ৬ সপ্তাহ | DORMANT BEAST</title>
+  <title>HSC প্ল্যানার | Google লগইন | DORMANT BEAST</title>
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', 'Roboto', 'Noto Sans Bengali', sans-serif; background: #f8fafc; color: #0f172a; }
-    .red-box { background: linear-gradient(135deg, #b91c1c, #991b1b, #7f1d1d); color: white; padding: 28px 20px; text-align: center; border-bottom: 4px solid #facc15; }
+    .red-box { background: linear-gradient(135deg, #b91c1c, #991b1b, #7f1d1d); color: white; padding: 28px 20px; text-align: center; border-bottom: 4px solid #facc15; position: relative; }
     .red-box h1 { font-size: 26px; margin-bottom: 8px; }
     .red-box .sub { font-size: 18px; margin-top: 6px; }
     .red-box .total-tasks { font-size: 14px; background: rgba(0,0,0,0.3); display: inline-block; padding: 4px 14px; border-radius: 40px; margin-top: 10px; }
@@ -19,6 +20,61 @@
     .prog-bg { background: rgba(255,255,255,0.3); border-radius: 30px; height: 10px; overflow: hidden; }
     .prog-fill { height: 100%; background: linear-gradient(90deg, #facc15, #f59e0b); width: 0%; transition: width 0.2s; }
     .prog-txt { font-size: 12px; margin-top: 5px; }
+    
+    /* মেনু বাটন ও ড্রপডাউন স্টাইল */
+    .menu-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.3);
+      border: none;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 30;
+    }
+    .menu-btn:hover { background: rgba(0,0,0,0.5); }
+    .dropdown-menu {
+      position: absolute;
+      top: 70px;
+      right: 20px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      overflow: hidden;
+      min-width: 160px;
+      z-index: 40;
+      display: none;
+    }
+    .dropdown-menu.show { display: block; }
+    .dropdown-menu a, .dropdown-menu button {
+      display: block;
+      width: 100%;
+      padding: 12px 20px;
+      text-align: left;
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: #1e293b;
+      text-decoration: none;
+      transition: background 0.1s;
+    }
+    .dropdown-menu a:hover, .dropdown-menu button:hover {
+      background: #f1f5f9;
+    }
+    .dropdown-menu .logout-item {
+      color: #dc2626;
+      border-top: 1px solid #e2e8f0;
+    }
+    
     .login-panel { background: #1e293b; color: white; padding: 14px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; border-bottom: 2px solid #facc15; }
     .admin-panel { background: #334155; padding: 12px 18px; display: none; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; border-bottom: 1px solid #475569; }
     .admin-panel button, .login-panel button, .member-home-btn { background: #facc15; border: none; padding: 6px 14px; border-radius: 40px; font-weight: bold; cursor: pointer; }
@@ -47,6 +103,7 @@
     .seg-item input { width: 18px; height: 18px; cursor: pointer; accent-color: #22c55e; }
     .hidden { display: none; }
     .dl-btn { display: block; width: 90%; max-width: 360px; margin: 20px auto; background: #3b82f6; border: none; border-radius: 40px; padding: 12px; color: white; font-weight: bold; cursor: pointer; text-align: center; }
+    .google-btn { background: #fff; color: #333; border: 1px solid #ccc; display: inline-flex; align-items: center; gap: 8px; }
   </style>
 </head>
 <body>
@@ -56,13 +113,25 @@
   <div class="sub" id="totalTaskDisplay">মোট টাস্ক লোড হচ্ছে...</div>
   <div class="everyday-target">🎯 প্রতিদিন ১টির বেশি অধ্যায় পড়তে হবে (মোট ৭৮ অধ্যায়, ৬ সপ্তাহ)</div>
   <div class="prog-wrap"><div class="prog-bg"><div class="prog-fill" id="pgBar"></div></div><div class="prog-txt" id="pgTxt">0%</div></div>
+  
+  <!-- মেনু বাটন (শুধু লগইন অবস্থায় দেখাবে) -->
+  <button id="menuBtn" class="menu-btn hidden">☰</button>
+  <div id="dropdownMenu" class="dropdown-menu">
+    <button id="menuLogoutBtn" class="logout-item">🚪 লগআউট</button>
+  </div>
 </div>
 
 <div class="login-panel" id="loginPanel">
   <label>🔐 ভূমিকা:</label>
-  <select id="roleSelect"><option value="member">📖 সাধারণ সদস্য</option><option value="admin">👑 অ্যাডমিন</option></select>
-  <div id="memberLoginArea"><label>👤 আপনার নাম:</label><input type="text" id="memberName" placeholder="যেমন: রাফি"><button id="memberLoginBtn">প্রবেশ</button></div>
-  <div id="adminLoginArea" class="hidden"><label>🔑 অ্যাডমিন পাসওয়ার্ড:</label><input type="password" id="adminPassword" placeholder="পাসওয়ার্ড"><button id="adminLoginBtn">লগইন</button></div>
+  <select id="roleSelect"><option value="member">📖 সাধারণ সদস্য (Google)</option><option value="admin">👑 অ্যাডমিন</option></select>
+  <div id="memberLoginArea">
+    <button id="googleSignInBtn" class="google-btn">🔑 Google দিয়ে লগইন করুন</button>
+  </div>
+  <div id="adminLoginArea" class="hidden">
+    <label>🔑 অ্যাডমিন পাসওয়ার্ড:</label>
+    <input type="password" id="adminPassword" placeholder="পাসওয়ার্ড">
+    <button id="adminLoginBtn">লগইন</button>
+  </div>
   <button id="logoutBtn" class="logout-btn hidden">🚪 লগআউট</button>
 </div>
 
@@ -73,17 +142,16 @@
 
 <div id="adminUserListContainer" class="user-list hidden"></div>
 
-<div class="controls" id="memberControls">
+<div class="controls" id="memberControls" style="display: none;">
   <label>বিষয় ফিল্টার :</label><select id="subjectFilter"><option value="all">সকল বিষয়</option><option value="পদার্থবিজ্ঞান ১ম পত্র">পদার্থ ১ম</option><option value="পদার্থবিজ্ঞান ২য় পত্র">পদার্থ ২য়</option><option value="রসায়ন ১ম পত্র">রসায়ন ১ম</option><option value="রসায়ন ২য় পত্র">রসায়ন ২য়</option><option value="জীববিজ্ঞান ১ম পত্র">জীব ১ম</option><option value="জীববিজ্ঞান ২য় পত্র">জীব ২য়</option><option value="উচ্চতর গণিত ১ম পত্র">উ. গণিত ১ম</option><option value="উচ্চতর গণিত ২য় পত্র">উ. গণিত ২য়</option><option value="তথ্য ও যোগাযোগ প্রযুক্তি">ICT</option></select>
   <div class="fbtns" id="weekButtons"></div>
-  <button id="memberHomeBtn" class="member-home-btn hidden">🏠 হোম / প্ল্যানার</button>
+  <button id="memberHomeBtn" class="member-home-btn">🏠 হোম / প্ল্যানার</button>
 </div>
 
 <div class="container" id="plannerContainer"></div>
 <button class="dl-btn" id="downloadBtn">📥 HTML ফাইল ডাউনলোড</button>
 
 <script>
-  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyCKAI1QVzRvOHYlhUWo2LE-82zoFI2bmJ0",
     authDomain: "hsc-planner-1b02f.firebaseapp.com",
@@ -95,8 +163,10 @@
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
+  const auth = firebase.auth();
+  const provider = new firebase.auth.GoogleAuthProvider();
 
-  // ===================== সব অধ্যায় (৭৮টি) অপরিবর্তিত =====================
+  // সব অধ্যায় (৭৮টি) আগের মতোই
   const allChapters = [
     { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "তাপগতিবিদ্যা" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "স্থির তড়িৎ" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "চল তড়িৎ" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "তড়িৎ প্রবাহের চুম্বকক্রিয়া" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "তড়িৎ চৌম্বকীয় আবেশ ও তড়িৎ প্রবাহ" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "জ্যামিতিক আলোকবিজ্ঞান" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "ভৌত আলোকবিজ্ঞান" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "আধুনিক পদার্থবিজ্ঞানের সূচনা" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "পরমাণুর মডেল ও নিউক্লিয়ার পদার্থ বিজ্ঞান" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "সেমিকন্ডাক্টর ও ইলেকট্রনিক্স" },
     { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "ভেক্টর" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "গতিবিদ্যা" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "নিউটনীয় বলবিদ্যা" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "কাজ ক্ষমতা শক্তি" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "মহাকর্ষ ও অভিকর্ষ" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "পদার্থের গাঠনিক ধর্ম" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "পর্যায় বৃত্ত গতি" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "তরঙ্গ" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "আদর্শ গ্যাসের গতিতত্ত্ব" },
@@ -111,68 +181,46 @@
   const totalChapters = allChapters.length;
   const totalTasks = totalChapters * 3;
 
-  // =============== নতুন: ৬ সপ্তাহে অধ্যায় বিতরণ (সব বিষয় মিশিয়ে) ===============
+  // ৬ সপ্তাহে অধ্যায় বিতরণ (সব বিষয় মিশিয়ে)
   function distributeChaptersToWeeks(numWeeks = 6) {
-    // প্রথমে বিষয় অনুযায়ী ইনডেক্সগুলো আলাদা করি
     const subjects = [...new Set(allChapters.map(c => c.subject))];
     const subjectIndices = {};
     subjects.forEach(sub => { subjectIndices[sub] = []; });
     for (let i = 0; i < allChapters.length; i++) {
-      const sub = allChapters[i].subject;
-      subjectIndices[sub].push(i);
+      subjectIndices[allChapters[i].subject].push(i);
     }
-    // প্রতিটি বিষয়ের অধ্যায় সংখ্যা
-    const subjectCounts = subjects.map(sub => ({ sub, count: subjectIndices[sub].length, taken: 0 }));
-    // মোট অধ্যায় 78, প্রতি সপ্তাহে 13টি
     const perWeek = totalChapters / numWeeks; // 13
-    const weeks = [];
-    for (let w = 0; w < numWeeks; w++) {
-      weeks.push({ id: w+1, label: `সপ্তাহ ${w+1}`, chapterIndices: [] });
-    }
-    // রাউন্ড রবিন পদ্ধতি: প্রতিটি সপ্তাহে প্রতিটি বিষয় থেকে যতটা সম্ভব সমান সংখ্যক অধ্যায়
-    let weekIdx = 0;
-    // প্রতিটি সপ্তাহে প্রতিটি বিষয় কত পাবে তা হিসাব করি
     const targetPerWeekPerSubject = {};
     subjects.forEach(sub => {
-      const totalSubCount = subjectIndices[sub].length;
-      const base = Math.floor(totalSubCount / numWeeks);
-      const remainder = totalSubCount % numWeeks;
+      const total = subjectIndices[sub].length;
+      const base = Math.floor(total / numWeeks);
+      const rem = total % numWeeks;
       targetPerWeekPerSubject[sub] = Array(numWeeks).fill(base);
-      for (let i = 0; i < remainder; i++) targetPerWeekPerSubject[sub][i]++; // প্রথম কয়েক সপ্তাহ বেশি পাবে
+      for (let i = 0; i < rem; i++) targetPerWeekPerSubject[sub][i]++;
     });
-    // এখন প্রতিটি বিষয়ের অধ্যায় তালিকা থেকে ঘুরিয়ে প্রতিটি সপ্তাহে নির্ধারিত সংখ্যক অধ্যায় নিব
+    const weeks = [];
+    for (let w = 0; w < numWeeks; w++) weeks.push({ id: w+1, label: `সপ্তাহ ${w+1}`, chapterIndices: [] });
     for (let sub of subjects) {
       const indices = [...subjectIndices[sub]];
       let pos = 0;
       for (let w = 0; w < numWeeks; w++) {
         const need = targetPerWeekPerSubject[sub][w];
         for (let i = 0; i < need; i++) {
-          if (pos < indices.length) {
-            weeks[w].chapterIndices.push(indices[pos]);
-            pos++;
-          }
+          if (pos < indices.length) weeks[w].chapterIndices.push(indices[pos++]);
         }
       }
     }
-    // এখন প্রতিটি সপ্তাহের অধ্যায়গুলো ক্রমানুসারে সাজাই (ইনডেক্স অনুযায়ী)
-    for (let w of weeks) {
-      w.chapterIndices.sort((a,b) => a - b);
-    }
-    // যাচাই: সব মিলে 78টি অধ্যায় আছে কিনা
-    let totalAssigned = weeks.reduce((sum, w) => sum + w.chapterIndices.length, 0);
-    if (totalAssigned !== totalChapters) console.warn("মিলছে না!", totalAssigned);
+    weeks.forEach(w => w.chapterIndices.sort((a,b)=>a-b));
+    weeks.forEach((w, idx) => w.color = `hsl(${200 + (idx+1)*25}, 70%, 48%)`);
     return weeks;
   }
-
   const weeks = distributeChaptersToWeeks(6);
 
-  // প্রতিটি সপ্তাহের জন্য রং তৈরি
-  weeks.forEach((w, idx) => {
-    w.color = `hsl(${200 + (idx+1)*25}, 70%, 48%)`;
-  });
-
-  let currentUser = null, isAdmin = false, viewingUser = null;
-  let activeWeek = null, currentSubject = 'all';
+  let currentUser = null;        // Firebase user object (for member)
+  let isAdmin = false;
+  let viewingUserId = null;
+  let activeWeek = null;
+  let currentSubject = 'all';
 
   function getSubjectColor(subject) {
     if (subject.includes("পদার্থবিজ্ঞান")) return { bg: "#dbeafe", text: "#1e3a8a", border: "#3b82f6" };
@@ -185,11 +233,7 @@
 
   function defaultTaskState() {
     let state = {};
-    for (let i = 0; i < totalChapters; i++) {
-      state[`${i}_cq`] = false;
-      state[`${i}_mcq`] = false;
-      state[`${i}_kokh`] = false;
-    }
+    for (let i = 0; i < totalChapters; i++) state[`${i}_cq`] = state[`${i}_mcq`] = state[`${i}_kokh`] = false;
     return state;
   }
 
@@ -210,21 +254,15 @@
     const container = document.getElementById('plannerContainer');
     container.innerHTML = '';
     if (!tasks) return;
-
-    if (isAdmin && viewingUser) {
+    if (isAdmin && viewingUserId) {
       const banner = document.createElement('div');
       banner.className = 'viewing-banner';
-      banner.innerHTML = `👁️ <strong>বর্তমানে দেখছেন: ${viewingUser}</strong> (শুধুমাত্র দেখার মোড)`;
+      banner.innerHTML = `👁️ <strong>বর্তমানে দেখছেন: ${viewingUserId}</strong> (শুধুমাত্র দেখার মোড)`;
       container.appendChild(banner);
     }
-
     for (let week of weeks) {
       if (activeWeek !== null && activeWeek !== week.id) continue;
-      // ফিল্টার অনুযায়ী বাদ দিন
-      let weekIndices = week.chapterIndices.filter(idx => {
-        if (currentSubject === 'all') return true;
-        return allChapters[idx].subject === currentSubject;
-      });
+      let weekIndices = week.chapterIndices.filter(idx => currentSubject === 'all' || allChapters[idx].subject === currentSubject);
       if (weekIndices.length === 0) continue;
       const weekDiv = document.createElement('div');
       weekDiv.style.marginBottom = '28px';
@@ -234,14 +272,14 @@
       header.innerHTML = `<span style="background:rgba(255,255,255,0.2); padding:2px 12px; border-radius:30px;">${week.label}</span><span>সপ্তাহ ${week.id}</span><span style="margin-left:auto;">${completed}/${weekIndices.length} কাজ সম্পূর্ণ</span>`;
       weekDiv.appendChild(header);
       for (let idx of weekIndices) {
-        const chapter = allChapters[idx];
-        const color = getSubjectColor(chapter.subject);
+        const chap = allChapters[idx];
+        const color = getSubjectColor(chap.subject);
         const card = document.createElement('div');
         card.className = 'task-card';
         card.style.borderLeftColor = color.border;
         card.innerHTML = `
-          <div class="task-header"><span class="task-number">কাজ ${idx+1}</span><span class="subject-badge" style="background:${color.bg}; color:${color.text}">${chapter.subject}</span></div>
-          <div class="chapter-name"><span>📘 ${chapter.chapter}</span>${(tasks[`${idx}_cq`] && tasks[`${idx}_mcq`] && tasks[`${idx}_kokh`]) ? '<span class="complete-badge">✓ সম্পূর্ণ অধ্যায়</span>' : ''}</div>
+          <div class="task-header"><span class="task-number">কাজ ${idx+1}</span><span class="subject-badge" style="background:${color.bg}; color:${color.text}">${chap.subject}</span></div>
+          <div class="chapter-name"><span>📘 ${chap.chapter}</span>${(tasks[`${idx}_cq`] && tasks[`${idx}_mcq`] && tasks[`${idx}_kokh`]) ? '<span class="complete-badge">✓ সম্পূর্ণ অধ্যায়</span>' : ''}</div>
           <div class="segments" id="seg-${idx}"></div>
         `;
         weekDiv.appendChild(card);
@@ -253,19 +291,16 @@
           chk.type = 'checkbox';
           chk.checked = tasks[key];
           if (readOnly) chk.disabled = true;
-          if (!readOnly) {
-            chk.addEventListener('change', (e) => {
+          if (!readOnly && !isAdmin) {
+            chk.addEventListener('change', () => {
               tasks[key] = chk.checked;
-              db.ref(`users/${currentUser}/tasks`).set(tasks);
+              db.ref(`users/${currentUser.uid}/tasks`).set(tasks);
               renderPlanner(tasks, false);
-              if (isAdmin && viewingUser) loadAllUsersAndRenderList();
             });
           }
           const lbl = document.createElement('span');
-          lbl.className = 'seg-label';
           lbl.innerText = label;
-          div.appendChild(chk);
-          div.appendChild(lbl);
+          div.appendChild(chk); div.appendChild(lbl);
           return div;
         };
         segDiv.appendChild(makeSegment('CQ (সৃজনশীল)', `${idx}_cq`));
@@ -278,20 +313,29 @@
     updateProgress(tasks);
   }
 
+  function loadMemberTasks(user) {
+    if (!user) return;
+    db.ref(`users/${user.uid}/tasks`).once('value', snap => {
+      let tasks = snap.val();
+      if (!tasks) tasks = defaultTaskState();
+      renderPlanner(tasks, false);
+    });
+    db.ref(`users/${user.uid}/info`).set({ email: user.email, displayName: user.displayName || user.email, lastLogin: Date.now() });
+  }
+
   function loadAllUsersAndRenderList() {
-    if (!isAdmin || currentUser !== null) return;
+    if (!isAdmin) return;
     db.ref('users').once('value', snap => {
       const users = snap.val() || {};
       const container = document.getElementById('adminUserListContainer');
       container.style.display = 'block';
-      const userNames = Object.keys(users);
-      if (userNames.length === 0) {
-        container.innerHTML = '<p style="color:white;">কোনো সদস্য এখনও যোগ দেয়নি।</p>';
-        return;
-      }
-      let html = '孟<table><thead><tr><th>সদস্যের নাম</th><th>সম্পন্ন টাস্ক</th><th>মোট টাস্ক</th><th>অগ্রগতি</th><th>বিস্তারিত</th></tr></thead><tbody>';
-      for (let u of userNames) {
-        let tasks = users[u].tasks || {};
+      const userIds = Object.keys(users);
+      if (userIds.length === 0) { container.innerHTML = '<p style="color:white;">কোনো সদস্য নেই</p>'; return; }
+      let html = '户<table><thead><tr><th>নাম / ইমেইল</th><th>সম্পন্ন টাস্ক</th><th>মোট</th><th>অগ্রগতি</th><th></th></tr></thead><tbody>';
+      for (let uid of userIds) {
+        const info = users[uid]?.info || {};
+        const display = info.displayName || info.email || uid;
+        let tasks = users[uid]?.tasks || {};
         let done = 0;
         for (let i = 0; i < totalChapters; i++) {
           if (tasks[`${i}_cq`]) done++;
@@ -299,131 +343,157 @@
           if (tasks[`${i}_kokh`]) done++;
         }
         let percent = Math.round((done / totalTasks) * 100);
-        html += `<tr><td>${u}</td><td>${done}</td><td>${totalTasks}</td><td>${percent}%</td><td><button class="view-user-btn" data-user="${u}">দেখুন</button></td></tr>`;
+        html += `<tr><td>${display}</td><td>${done}</td><td>${totalTasks}</td><td>${percent}%</td><td><button class="view-user-btn" data-uid="${uid}">দেখুন</button></td></tr>`;
       }
       html += '</tbody></table>';
       container.innerHTML = html;
       document.querySelectorAll('.view-user-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          const username = btn.getAttribute('data-user');
-          viewingUser = username;
-          currentUser = username;
-          document.getElementById('adminStatus').innerHTML = `👁️ বর্তমানে দেখছেন: <strong>${username}</strong> এর অগ্রগতি | `;
-          db.ref(`users/${username}/tasks`).once('value', snap => {
-            const tasks = snap.val() || defaultTaskState();
-            renderPlanner(tasks, true);
+          const uid = btn.getAttribute('data-uid');
+          viewingUserId = uid;
+          db.ref(`users/${uid}/tasks`).once('value', snap => {
+            renderPlanner(snap.val() || defaultTaskState(), true);
           });
+          document.getElementById('adminStatus').innerHTML = `👁️ দেখছেন: ${uid} | `;
           container.style.display = 'none';
         });
       });
     });
   }
 
-  // লগইন ইভেন্ট (নাম ভিত্তিক)
-  document.getElementById('memberLoginBtn').addEventListener('click', () => {
-    const name = document.getElementById('memberName').value.trim();
-    if (!name) { alert('নাম লিখুন'); return; }
-    isAdmin = false;
-    currentUser = name;
-    viewingUser = null;
-    db.ref(`users/${currentUser}/tasks`).once('value', snap => {
-      let tasks = snap.val();
-      if (!tasks) tasks = defaultTaskState();
-      renderPlanner(tasks, false);
-    });
-    document.getElementById('loginPanel').style.display = 'none';
-    document.getElementById('adminPanel').classList.add('hidden');
-    document.getElementById('adminUserListContainer').style.display = 'none';
-    document.getElementById('logoutBtn').classList.remove('hidden');
-    document.getElementById('memberControls').style.display = 'flex';
-    document.getElementById('memberHomeBtn').classList.remove('hidden');
-    localStorage.setItem('plannerUser', name);
+  // মেনু টগল
+  const menuBtn = document.getElementById('menuBtn');
+  const dropdown = document.getElementById('dropdownMenu');
+  menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('show');
+  });
+  document.addEventListener('click', function(e) {
+    if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.remove('show');
+  });
+  document.getElementById('menuLogoutBtn').addEventListener('click', () => {
+    if (isAdmin) {
+      isAdmin = false;
+      currentUser = null;
+      viewingUserId = null;
+      document.getElementById('adminPanel').classList.add('hidden');
+      document.getElementById('adminUserListContainer').style.display = 'none';
+      document.getElementById('memberControls').style.display = 'none';
+      document.getElementById('loginPanel').style.display = 'flex';
+      document.getElementById('plannerContainer').innerHTML = '';
+      document.getElementById('pgBar').style.width = '0%';
+      document.getElementById('pgTxt').innerHTML = '0%';
+      menuBtn.classList.add('hidden');
+    } else {
+      auth.signOut();
+    }
+    dropdown.classList.remove('show');
   });
 
+  // গুগল সাইন-ইন
+  document.getElementById('googleSignInBtn').addEventListener('click', () => {
+    auth.signInWithPopup(provider).catch(err => alert('লগইন ব্যর্থ: '+err.message));
+  });
+  // অ্যাডমিন লগইন
   document.getElementById('adminLoginBtn').addEventListener('click', () => {
     const pwd = document.getElementById('adminPassword').value;
     if (pwd !== 'dormant2025') { alert('ভুল পাসওয়ার্ড'); return; }
-    isAdmin = true;
-    currentUser = null;
-    viewingUser = null;
-    document.getElementById('loginPanel').style.display = 'none';
-    document.getElementById('adminPanel').classList.remove('hidden');
-    document.getElementById('logoutBtn').classList.remove('hidden');
-    document.getElementById('memberControls').style.display = 'none';
-    document.getElementById('adminUserListContainer').style.display = 'block';
-    document.getElementById('plannerContainer').innerHTML = '<div style="text-align:center;padding:40px;">👑 অ্যাডমিন মোড: নিচের তালিকা থেকে যেকোনো সদস্যের নামের পাশে "দেখুন" ক্লিক করুন।</div>';
-    loadAllUsersAndRenderList();
-  });
-
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    isAdmin = false; currentUser = null; viewingUser = null;
-    document.getElementById('loginPanel').style.display = 'flex';
-    document.getElementById('adminPanel').classList.add('hidden');
-    document.getElementById('adminUserListContainer').style.display = 'none';
-    document.getElementById('logoutBtn').classList.add('hidden');
-    document.getElementById('memberControls').style.display = 'flex';
-    document.getElementById('plannerContainer').innerHTML = '';
-    document.getElementById('pgBar').style.width = '0%';
-    document.getElementById('pgTxt').innerHTML = '0%';
-    document.getElementById('memberName').value = '';
-    document.getElementById('adminPassword').value = '';
-    document.getElementById('roleSelect').value = 'member';
-    document.getElementById('memberLoginArea').classList.remove('hidden');
-    document.getElementById('adminLoginArea').classList.add('hidden');
-    localStorage.removeItem('plannerUser');
-  });
-
-  document.getElementById('homeBtn').addEventListener('click', () => {
-    if (isAdmin) {
-      currentUser = null; viewingUser = null;
-      document.getElementById('plannerContainer').innerHTML = '<div style="text-align:center;padding:40px;">👑 অ্যাডমিন মোড: নিচের তালিকা থেকে যেকোনো সদস্যের নামের পাশে "দেখুন" ক্লিক করুন।</div>';
+    auth.signOut().then(() => {
+      isAdmin = true;
+      currentUser = null;
+      viewingUserId = null;
+      document.getElementById('loginPanel').style.display = 'none';
+      document.getElementById('adminPanel').classList.remove('hidden');
+      document.getElementById('logoutBtn').classList.remove('hidden');
+      document.getElementById('memberControls').style.display = 'none';
+      document.getElementById('adminUserListContainer').style.display = 'block';
+      document.getElementById('plannerContainer').innerHTML = '<div style="text-align:center;padding:40px;">👑 অ্যাডমিন মোড: তালিকা থেকে দেখুন</div>';
       loadAllUsersAndRenderList();
+      menuBtn.classList.remove('hidden');
+    });
+  });
+
+  // লগআউট (পুরনো বাটন) - মেনুতেও আছে
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    if (isAdmin) {
+      isAdmin = false;
+      currentUser = null;
+      viewingUserId = null;
+      document.getElementById('adminPanel').classList.add('hidden');
+      document.getElementById('adminUserListContainer').style.display = 'none';
+      document.getElementById('memberControls').style.display = 'none';
+      document.getElementById('loginPanel').style.display = 'flex';
+      document.getElementById('plannerContainer').innerHTML = '';
+      document.getElementById('pgBar').style.width = '0%';
+      document.getElementById('pgTxt').innerHTML = '0%';
+      menuBtn.classList.add('hidden');
+    } else {
+      auth.signOut();
     }
   });
+
+  // অথ স্টেট লিসেনার
+  auth.onAuthStateChanged(user => {
+    if (user && !isAdmin) {
+      currentUser = user;
+      isAdmin = false;
+      viewingUserId = null;
+      document.getElementById('loginPanel').style.display = 'none';
+      document.getElementById('adminPanel').classList.add('hidden');
+      document.getElementById('adminUserListContainer').style.display = 'none';
+      document.getElementById('logoutBtn').classList.remove('hidden');
+      document.getElementById('memberControls').style.display = 'flex';
+      document.getElementById('memberHomeBtn').classList.remove('hidden');
+      menuBtn.classList.remove('hidden');
+      loadMemberTasks(user);
+    } else if (!user && !isAdmin) {
+      currentUser = null;
+      document.getElementById('loginPanel').style.display = 'flex';
+      document.getElementById('memberControls').style.display = 'none';
+      document.getElementById('adminPanel').classList.add('hidden');
+      document.getElementById('logoutBtn').classList.add('hidden');
+      document.getElementById('plannerContainer').innerHTML = '';
+      document.getElementById('pgBar').style.width = '0%';
+      document.getElementById('pgTxt').innerHTML = '0%';
+      menuBtn.classList.add('hidden');
+    }
+  });
+
+  // অন্যান্য ইভেন্ট লিসেনার (ফিল্টার, উইক বাটন ইত্যাদি)
   document.getElementById('memberHomeBtn').addEventListener('click', () => {
-    if (!isAdmin && currentUser) {
-      db.ref(`users/${currentUser}/tasks`).once('value', snap => {
-        const tasks = snap.val() || defaultTaskState();
-        renderPlanner(tasks, false);
-      });
+    if (currentUser && !isAdmin) loadMemberTasks(currentUser);
+  });
+  document.getElementById('homeBtn').addEventListener('click', () => {
+    if (isAdmin) {
+      viewingUserId = null;
+      document.getElementById('plannerContainer').innerHTML = '<div style="text-align:center;padding:40px;">👑 অ্যাডমিন মোড: তালিকা থেকে দেখুন</div>';
+      loadAllUsersAndRenderList();
     }
   });
   document.getElementById('memberListBtn').addEventListener('click', () => {
     if (isAdmin) {
-      currentUser = null; viewingUser = null;
-      document.getElementById('plannerContainer').innerHTML = '<div style="text-align:center;padding:40px;">👑 অ্যাডমিন মোড: নিচের তালিকা থেকে যেকোনো সদস্যের নামের পাশে "দেখুন" ক্লিক করুন।</div>';
+      viewingUserId = null;
+      document.getElementById('plannerContainer').innerHTML = '<div style="text-align:center;padding:40px;">👑 অ্যাডমিন মোড: তালিকা থেকে দেখুন</div>';
       loadAllUsersAndRenderList();
     }
   });
-
   document.getElementById('roleSelect').addEventListener('change', (e) => {
     const isAdminRole = e.target.value === 'admin';
     document.getElementById('memberLoginArea').classList.toggle('hidden', isAdminRole);
     document.getElementById('adminLoginArea').classList.toggle('hidden', !isAdminRole);
   });
-
   document.getElementById('subjectFilter').addEventListener('change', (e) => {
     currentSubject = e.target.value;
-    if (currentUser && !isAdmin) {
-      db.ref(`users/${currentUser}/tasks`).once('value', snap => {
-        const tasks = snap.val() || defaultTaskState();
-        renderPlanner(tasks, false);
-      });
-    } else if (isAdmin && viewingUser) {
-      db.ref(`users/${viewingUser}/tasks`).once('value', snap => {
-        const tasks = snap.val() || defaultTaskState();
-        renderPlanner(tasks, true);
-      });
-    }
+    if (currentUser && !isAdmin) loadMemberTasks(currentUser);
+    else if (isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val() || defaultTaskState(), true));
   });
-
   function buildWeekButtons() {
     const btnContainer = document.getElementById('weekButtons');
     btnContainer.innerHTML = '';
     const allBtn = document.createElement('button');
     allBtn.className = 'fbtn active';
     allBtn.innerText = 'সব সপ্তাহ';
-    allBtn.onclick = () => { activeWeek = null; if(currentUser && !isAdmin) db.ref(`users/${currentUser}/tasks`).once('value', snap => renderPlanner(snap.val()||defaultTaskState(), false)); else if(isAdmin && viewingUser) db.ref(`users/${viewingUser}/tasks`).once('value', snap => renderPlanner(snap.val()||defaultTaskState(), true)); updateActiveButton(allBtn); };
+    allBtn.onclick = () => { activeWeek = null; if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val()||defaultTaskState(), true)); updateActiveButton(allBtn); };
     btnContainer.appendChild(allBtn);
     weeks.forEach(w => {
       const btn = document.createElement('button');
@@ -431,8 +501,8 @@
       btn.innerText = w.label;
       btn.onclick = () => {
         activeWeek = (activeWeek === w.id) ? null : w.id;
-        if(currentUser && !isAdmin) db.ref(`users/${currentUser}/tasks`).once('value', snap => renderPlanner(snap.val()||defaultTaskState(), false));
-        else if(isAdmin && viewingUser) db.ref(`users/${viewingUser}/tasks`).once('value', snap => renderPlanner(snap.val()||defaultTaskState(), true));
+        if(currentUser && !isAdmin) loadMemberTasks(currentUser);
+        else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val()||defaultTaskState(), true));
         updateActiveButton(btn);
       };
       btnContainer.appendChild(btn);
@@ -444,46 +514,24 @@
     }
   }
   buildWeekButtons();
-
   document.getElementById('exportAllDataBtn').addEventListener('click', () => {
+    if (!isAdmin) return;
     db.ref('users').once('value', snap => {
-      const data = snap.val() || {};
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+      const blob = new Blob([JSON.stringify(snap.val() || {}, null, 2)], {type: 'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `hsc_users_${new Date().toISOString().slice(0,19)}.json`;
       a.click();
     });
   });
-
   document.getElementById('downloadBtn').addEventListener('click', () => {
     const html = document.documentElement.outerHTML;
     const blob = new Blob([html], {type: 'text/html'});
     const a = document.createElement('a');
+    a.download = 'HSC_Planner_Google_Login.html';
     a.href = URL.createObjectURL(blob);
-    a.download = 'HSC_Online_Planner_6weeks.html';
     a.click();
   });
-
-  const savedUser = localStorage.getItem('plannerUser');
-  if (savedUser) {
-    currentUser = savedUser;
-    isAdmin = false;
-    db.ref(`users/${currentUser}/tasks`).once('value', snap => {
-      let tasks = snap.val();
-      if (!tasks) tasks = defaultTaskState();
-      renderPlanner(tasks, false);
-    });
-    document.getElementById('loginPanel').style.display = 'none';
-    document.getElementById('adminPanel').classList.add('hidden');
-    document.getElementById('logoutBtn').classList.remove('hidden');
-    document.getElementById('memberControls').style.display = 'flex';
-    document.getElementById('memberHomeBtn').classList.remove('hidden');
-  } else {
-    document.getElementById('loginPanel').style.display = 'flex';
-    document.getElementById('memberLoginArea').classList.remove('hidden');
-    document.getElementById('adminLoginArea').classList.add('hidden');
-  }
 </script>
 </body>
 </html>
