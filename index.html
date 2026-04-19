@@ -57,7 +57,8 @@
 <div class="red-box">
   <h1>📘 Study Planner by DORMANT BEAST</h1>
   <div class="sub" id="totalTaskDisplay">মোট টাস্ক লোড হচ্ছে...</div>
-  <div class="everyday-target">🎯 প্রতিদিন ১টি অধ্যায় (মোট ৭৮ অধ্যায়)</div>
+  <!-- পরিবর্তিত লাইন নিচে -->
+  <div class="everyday-target">🎯 প্রতিদিন ১টির বেশি অধ্যায় পড়তে হবে (মোট ৭৮ অধ্যায়)</div>
   <div class="prog-wrap"><div class="prog-bg"><div class="prog-fill" id="pgBar"></div></div><div class="prog-txt" id="pgTxt">0%</div></div>
 </div>
 
@@ -242,7 +243,7 @@
         container.innerHTML = '<p style="color:white;">কোনো সদস্য এখনও যোগ দেয়নি।</p>';
         return;
       }
-      let html = '<table><th>সদস্যের নাম</th><th>সম্পন্ন টাস্ক</th><th>মোট টাস্ক</th><th>অগ্রগতি</th><th>বিস্তারিত</th></table>';
+      let html = '</table><th>সদস্যের নাম</th><th>সম্পন্ন টাস্ক</th><th>মোট টাস্ক</th><th>অগ্রগতি</th><th>বিস্তারিত</th></table>';
       for (let u of userNames) {
         let tasks = users[u].tasks || {};
         let done = 0;
