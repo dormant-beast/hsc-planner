@@ -131,6 +131,7 @@
     <div class="flex gap-1.5 flex-wrap">
       <button id="showPlannerBtn" class="nav-pill px-5 py-2.5 rounded-full text-sm font-medium transition-all">📘 Planner</button>
       <button id="showTimerBtn" class="nav-pill px-5 py-2.5 rounded-full text-sm font-medium bg-yellow-500/20 border-yellow-400/60 text-yellow-200">⏱️ Pomodoro</button>
+      <button id="showLiveBtn" class="nav-pill px-5 py-2.5 rounded-full text-sm font-medium">👥 Live</button>
       <button id="showRankingBtn" class="nav-pill px-5 py-2.5 rounded-full text-sm font-medium">🏆 Ranking</button>
       <button id="showReportBtn" class="nav-pill px-5 py-2.5 rounded-full text-sm font-medium">📊 Weekly Report</button>
     </div>
@@ -175,6 +176,23 @@
   </div>
   
   <div id="adminUserListContainer" class="hidden glass-card p-5 mb-6 overflow-x-auto"></div>
+
+  <!-- ========== LIVE STUDY GROUP SECTION ========== -->
+  <div id="liveStudySection" class="mb-12 hidden">
+    <div class="glass-card p-6 md:p-8">
+      <div class="flex items-center gap-3 border-b border-white/10 pb-5 mb-6">
+        <span class="text-3xl">🧑‍🎓</span>
+        <h2 class="text-2xl font-bold">Live Study Group</h2>
+        <span id="activeCountDisplay" class="ml-auto bg-green-500/20 text-green-300 px-4 py-1.5 rounded-full text-sm border border-green-500/40">0 active</span>
+      </div>
+      <div id="activeMembersList" class="space-y-2 max-h-[500px] overflow-y-auto pr-2">
+        <div class="text-center text-white/40 py-12">✨ No one is studying right now. Be the first!</div>
+      </div>
+      <div class="mt-6 pt-4 border-t border-white/10 text-center text-sm text-white/40 italic">
+        💡 Start a focus session to appear here and study together
+      </div>
+    </div>
+  </div>
 
   <!-- ========== WEEKLY REPORT SECTION ========== -->
   <div id="reportSection" class="mb-12 hidden section-fade">
@@ -330,6 +348,7 @@
     let sessionHistory = [];
     let reportWeekOffset = 0;
     let rankUnsub = null;
+    let liveTimerUpdater = null;
 
     // Chapters data (78 chapters)
     const allChapters = [
@@ -355,7 +374,7 @@
 
     // ========== UI HELPERS ==========
     function hideAllSections() {
-      ['plannerSection','timerSection','rankingSection','reportSection'].forEach(id => {
+      ['plannerSection','timerSection','liveStudySection','rankingSection','reportSection'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
       });
     }
@@ -367,7 +386,83 @@
       return String(str).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
     }
 
-    // ========== POMODORO ==========
+    // ========== LIVE PRESENCE SYSTEM ==========
+    const activeSessionsRef = db.ref('activeSessions');
+    
+    function markUserActive() {
+      if (!currentUser || isAdmin) return;
+      const userRef = activeSessionsRef.child(currentUser.uid);
+      const userData = {
+        name: currentUser.displayName || currentUser.email || 'Anonymous Beast',
+        startedAt: firebase.database.ServerValue.TIMESTAMP,
+        sessionType: 'focus'
+      };
+      userRef.set(userData);
+      userRef.onDisconnect().remove();
+    }
+    
+    function markUserInactive() {
+      if (!currentUser || isAdmin) return;
+      activeSessionsRef.child(currentUser.uid).remove();
+    }
+    
+    function listenToActiveSessions() {
+      activeSessionsRef.on('value', (snapshot) => {
+        const sessions = snapshot.val() || {};
+        const members = Object.entries(sessions).map(([uid, data]) => ({ uid, ...data }));
+        members.sort((a, b) => b.startedAt - a.startedAt);
+        renderActiveMembers(members);
+      });
+    }
+    
+    function renderActiveMembers(members) {
+      const container = document.getElementById('activeMembersList');
+      const countSpan = document.getElementById('activeCountDisplay');
+      
+      if (liveTimerUpdater) clearInterval(liveTimerUpdater);
+      
+      if (members.length === 0) {
+        container.innerHTML = '<div class="text-center text-white/40 py-12">✨ No one is studying right now. Be the first!</div>';
+        countSpan.innerText = '0 active';
+        return;
+      }
+      
+      countSpan.innerText = `${members.length} active`;
+      
+      let html = '';
+      members.forEach(m => {
+        const started = m.startedAt || Date.now();
+        html += `
+          <div class="flex justify-between items-center p-3 glass-card rounded-xl bg-green-500/5 border-l-4 border-green-500">
+            <div class="flex items-center gap-2">
+              <span class="text-green-400 text-lg">●</span>
+              <span class="font-medium">${escapeHtml(m.name)}</span>
+            </div>
+            <div class="font-mono text-yellow-300 font-bold">
+              <span class="live-timer" data-started="${started}">00:00:00</span>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+      
+      function updateAllTimers() {
+        document.querySelectorAll('.live-timer').forEach(el => {
+          const started = parseInt(el.dataset.started);
+          if (!started) return;
+          const diff = Math.floor((Date.now() - started) / 1000);
+          const hours = Math.floor(diff / 3600);
+          const minutes = Math.floor((diff % 3600) / 60);
+          const seconds = diff % 60;
+          el.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        });
+      }
+      
+      updateAllTimers();
+      liveTimerUpdater = setInterval(updateAllTimers, 1000);
+    }
+
+    // ========== POMODORO (modified for live presence) ==========
     function loadSettings() {
       const saved = localStorage.getItem('pomodoro_settings');
       if (saved) settings = { ...settings, ...JSON.parse(saved) };
@@ -451,6 +546,11 @@
     }
     function startTimer() {
       if (timerInterval) clearInterval(timerInterval);
+      
+      if (currentSessionType === 'focus' && currentUser && !isAdmin) {
+        markUserActive();
+      }
+      
       timerInterval = setInterval(() => {
         if (timeRemaining <= 1) {
           clearInterval(timerInterval); timerInterval = null;
@@ -459,6 +559,7 @@
           addToHistory(currentSessionType, duration);
           
           if (currentSessionType === 'focus' && currentUser && !isAdmin) {
+            markUserInactive();
             db.ref(`users/${currentUser.uid}/info`).transaction(info => {
               if (!info) info = { totalMinutes: 0 };
               info.totalMinutes = (info.totalMinutes || 0) + duration;
@@ -484,6 +585,9 @@
       }, 1000);
     }
     function switchSession(type) {
+      if (currentSessionType === 'focus' && currentUser && !isAdmin) {
+        markUserInactive();
+      }
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = null;
       currentSessionType = type;
@@ -494,6 +598,9 @@
         tab.classList.toggle('bg-yellow-500/40', tab.dataset.session === type);
         tab.classList.toggle('text-white', tab.dataset.session === type);
       });
+      if (type === 'focus' && currentUser && !isAdmin) {
+        markUserActive();
+      }
     }
     async function saveFocusMinutesToWeekly(uid, minutes) {
       const now = new Date();
@@ -762,13 +869,17 @@
             <button id="userLogout" class="bg-white/10 px-4 py-2 rounded-full text-sm">Logout</button>
             <button id="editNicknameBtn" class="bg-yellow-500/20 px-4 py-2 rounded-full text-sm">✏️ Name</button>
           `;
-          document.getElementById('userLogout').onclick = () => auth.signOut();
+          document.getElementById('userLogout').onclick = async () => {
+            markUserInactive();
+            await auth.signOut();
+          };
           document.getElementById('editNicknameBtn').onclick = async () => {
             const newNick = prompt('Enter display name:');
             if (newNick) await db.ref(`users/${currentUser.uid}/info`).update({ nickname: newNick });
           };
           await loadMemberTasks(user);
           startRankingListener();
+          listenToActiveSessions();
           showSection('timerSection');
         } else if (!user && !isAdmin) {
           document.getElementById('loginPanel').classList.remove('hidden');
@@ -785,6 +896,7 @@
         else if (isAdmin) document.getElementById('plannerContainer').innerHTML = '<div class="text-center py-10 text-white/40">Select a member from list</div>';
       };
       document.getElementById('showTimerBtn').onclick = () => showSection('timerSection');
+      document.getElementById('showLiveBtn').onclick = () => showSection('liveStudySection');
       document.getElementById('showRankingBtn').onclick = () => showSection('rankingSection');
       document.getElementById('showReportBtn').onclick = () => {
         showSection('reportSection');
@@ -824,8 +936,15 @@
 
       // Pomodoro controls
       document.getElementById('startTimerBtn').onclick = startTimer;
-      document.getElementById('pauseTimerBtn').onclick = () => { if(timerInterval) clearInterval(timerInterval); timerInterval = null; };
-      document.getElementById('resetTimerBtn').onclick = resetTimerUI;
+      document.getElementById('pauseTimerBtn').onclick = () => { 
+        if(timerInterval) clearInterval(timerInterval); 
+        timerInterval = null; 
+        if (currentSessionType === 'focus' && currentUser && !isAdmin) markUserInactive();
+      };
+      document.getElementById('resetTimerBtn').onclick = () => {
+        resetTimerUI();
+        if (currentSessionType === 'focus' && currentUser && !isAdmin) markUserInactive();
+      };
       document.querySelectorAll('.session-tab').forEach(btn => btn.onclick = () => switchSession(btn.dataset.session));
       document.getElementById('openSettingsBtn').onclick = () => document.getElementById('settingsModal').classList.remove('hidden');
       document.getElementById('closeSettingsBtn').onclick = () => document.getElementById('settingsModal').classList.add('hidden');
@@ -859,6 +978,7 @@
       renderHistory();
       updateStats();
       startRankingListener();
+      listenToActiveSessions();
       showSection('timerSection');
     });
   })();
