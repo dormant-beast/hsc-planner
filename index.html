@@ -8,7 +8,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <!-- Tailwind + Inter font -->
+  <!-- Tailwind + Inter Font -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <style>
@@ -18,7 +18,6 @@
       min-height: 100vh;
       position: relative;
     }
-    /* animated orbs for stylish background */
     body::before {
       content: '';
       position: fixed;
@@ -51,7 +50,6 @@
       0% { transform: translate(0,0) scale(1); }
       100% { transform: translate(-6%, -10%) scale(1.15); }
     }
-
     .glass-card {
       background: rgba(15, 23, 42, 0.6);
       backdrop-filter: blur(16px) saturate(180%);
@@ -65,7 +63,6 @@
       border-color: rgba(250,204,21,0.3);
       box-shadow: 0 25px 45px -12px #00000080, 0 0 0 1px #facc1540 inset;
     }
-
     .btn-glow {
       background: linear-gradient(145deg, #fbbf24, #d97706);
       color: black;
@@ -78,17 +75,13 @@
       transform: translateY(-2px);
       box-shadow: 0 14px 25px -8px #fbbf24, 0 0 0 1px #fef3c7 inset;
     }
-
     .timer-ring {
       transition: stroke-dashoffset 0.2s linear;
       filter: drop-shadow(0 0 10px #fbbf24);
     }
-
-    /* custom scroll */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; border-radius: 12px; }
     ::-webkit-scrollbar-thumb { background: #eab308; border-radius: 12px; border: 1px solid #1e293b; }
-
     .nav-pill {
       background: rgba(255,255,255,0.03);
       backdrop-filter: blur(8px);
@@ -100,11 +93,6 @@
       border-color: #facc15;
       color: #fde68a;
     }
-
-    /* smooth section transitions */
-    .section-fade {
-      transition: opacity 0.25s;
-    }
     .hover-lift {
       transition: transform 0.15s, box-shadow 0.2s;
     }
@@ -112,8 +100,6 @@
       transform: translateY(-3px);
       box-shadow: 0 18px 30px -10px #000000b0;
     }
-
-    /* admin table style */
     .admin-table th {
       text-align: left;
       padding: 12px 8px;
@@ -139,7 +125,7 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-5 relative z-20">
   
-  <!-- === HEADER with glass effect === -->
+  <!-- ========== HEADER ========== -->
   <div class="flex flex-wrap justify-between items-center gap-4 mb-8 glass-card px-6 py-4 border border-yellow-500/20">
     <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent drop-shadow-lg">DORMANT BEAST</h1>
     <div class="flex gap-1.5 flex-wrap">
@@ -151,7 +137,7 @@
     <div id="userStatusArea" class="flex items-center gap-3"></div>
   </div>
 
-  <!-- === LOGIN PANEL (stylish) === -->
+  <!-- ========== LOGIN PANEL ========== -->
   <div id="loginPanel" class="glass-card max-w-md mx-auto p-8 text-center hover-lift">
     <div class="w-20 h-20 mx-auto bg-yellow-500/20 rounded-full flex items-center justify-center text-4xl mb-4 border border-yellow-400/40">⚡</div>
     <h2 class="text-3xl font-bold bg-gradient-to-r from-white to-amber-200 bg-clip-text text-transparent">Unlock the Beast</h2>
@@ -166,6 +152,7 @@
       <button id="googleSignInBtn" class="btn-glow w-full text-black font-bold py-3.5 rounded-full flex items-center justify-center gap-2 text-lg shadow-2xl">
         <span class="text-xl">🔐</span> Sign in with Google
       </button>
+      <p id="loginErrorMsg" class="text-red-400 text-sm mt-3 hidden"></p>
     </div>
     
     <div id="adminLoginArea" class="hidden mt-5 space-y-4">
@@ -177,7 +164,7 @@
     </div>
   </div>
 
-  <!-- === ADMIN PANEL (only visible for admin) === -->
+  <!-- ========== ADMIN PANEL ========== -->
   <div id="adminPanel" class="hidden glass-card p-4 mb-6 flex flex-wrap items-center gap-3 border-l-4 border-yellow-500">
     <div class="flex gap-2 flex-wrap">
       <button id="exportAllDataBtn" class="bg-white/5 hover:bg-yellow-500/20 px-5 py-2.5 rounded-full text-sm border border-white/10 transition">📁 Export JSON</button>
@@ -187,10 +174,9 @@
     <div id="adminStatus" class="text-yellow-300 text-xs ml-auto font-mono bg-black/30 px-4 py-1.5 rounded-full"></div>
   </div>
   
-  <!-- Admin member list container -->
   <div id="adminUserListContainer" class="hidden glass-card p-5 mb-6 overflow-x-auto"></div>
 
-  <!-- === WEEKLY REPORT SECTION === -->
+  <!-- ========== WEEKLY REPORT SECTION ========== -->
   <div id="reportSection" class="mb-12 hidden section-fade">
     <div class="glass-card p-6 md:p-8">
       <div class="flex items-center justify-between border-b border-white/10 pb-5 mb-6">
@@ -205,7 +191,7 @@
     </div>
   </div>
 
-  <!-- === RANKING (Leaderboard) === -->
+  <!-- ========== RANKING SECTION ========== -->
   <div id="rankingSection" class="mb-12 hidden section-fade">
     <div class="glass-card p-6 md:p-8">
       <div class="flex items-center gap-3 border-b border-white/10 pb-5 mb-6">
@@ -218,11 +204,10 @@
     </div>
   </div>
 
-  <!-- === POMODORO TIMER (beautified) === -->
+  <!-- ========== POMODORO TIMER SECTION ========== -->
   <div id="timerSection" class="mb-12">
     <div class="glass-card p-6 md:p-10">
       <div class="flex flex-col lg:flex-row gap-10">
-        <!-- Timer circle -->
         <div class="flex-1 flex flex-col items-center">
           <div class="relative w-72 h-72 md:w-80 md:h-80">
             <svg class="w-full h-full transform -rotate-90 drop-shadow-2xl" viewBox="0 0 100 100">
@@ -247,7 +232,6 @@
             <button id="resetTimerBtn" class="bg-white/10 hover:bg-white/20 px-8 py-3.5 rounded-full text-lg border border-white/20">⟳ Reset</button>
           </div>
         </div>
-        <!-- Right panel -->
         <div class="flex-1 space-y-6">
           <div class="flex gap-1.5 p-1.5 rounded-full bg-black/30 backdrop-blur-sm border border-white/10">
             <button data-session="focus" class="session-tab flex-1 py-2.5 rounded-full text-sm font-semibold transition-all bg-yellow-500/40 text-white shadow-inner">🎯 Focus</button>
@@ -266,7 +250,7 @@
     </div>
   </div>
 
-  <!-- === SETTINGS MODAL === -->
+  <!-- ========== SETTINGS MODAL ========== -->
   <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 hidden transition-all">
     <div class="glass-card w-11/12 max-w-md p-8 border border-yellow-500/40">
       <h3 class="text-2xl font-bold mb-6 text-yellow-200">⚙️ Session durations</h3>
@@ -282,7 +266,7 @@
     </div>
   </div>
 
-  <!-- === PLANNER SECTION (tasks) === -->
+  <!-- ========== PLANNER SECTION ========== -->
   <div id="plannerSection" class="hidden section-fade">
     <div class="glass-card p-5 mb-6 text-center border border-yellow-500/20">
       <div class="flex justify-between items-center flex-wrap gap-3">
@@ -308,13 +292,13 @@
     <div id="plannerContainer" class="space-y-5"></div>
   </div>
 
-  <!-- download button -->
+  <!-- Download button -->
   <button id="downloadBtn" class="fixed bottom-6 right-6 bg-yellow-500/20 backdrop-blur-xl w-14 h-14 rounded-full text-2xl hover:bg-yellow-500/40 border border-yellow-400/60 shadow-2xl transition z-50">📥</button>
 </div>
 
 <script>
   (function(){
-    // ========== FIREBASE ==========
+    // ========== FIREBASE INIT ==========
     const firebaseConfig = {
       apiKey: "AIzaSyCKAI1QVzRvOHYlhUWo2LE-82zoFI2bmJ0",
       authDomain: "hsc-planner-1b02f.firebaseapp.com",
@@ -327,18 +311,27 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const auth = firebase.auth();
-    const provider = new firebase.auth.GoogleAuthProvider();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-    // ========== STATE ==========
-    let currentUser = null, isAdmin = false, viewingUserId = null;
-    let activeWeek = null, currentSubject = 'all';
-    let timerInterval = null, currentSessionType = 'focus', timeRemaining = 25*60;
+    // ========== GLOBAL STATE ==========
+    let currentUser = null;
+    let isAdmin = false;
+    let viewingUserId = null;
+    let activeWeek = null;
+    let currentSubject = 'all';
+    
+    // Pomodoro state
+    let timerInterval = null;
+    let currentSessionType = 'focus';
+    let timeRemaining = 25 * 60;
     let totalFocusSessionsCompleted = 0;
-    let settings = { focus:25, shortBreak:5, longBreak:15 };
+    let settings = { focus: 25, shortBreak: 5, longBreak: 15 };
     let sessionHistory = [];
     let reportWeekOffset = 0;
     let rankUnsub = null;
-    
+
+    // Chapters data (78 chapters)
     const allChapters = [
       { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Thermodynamics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Static Electricity" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Current Electricity" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Magnetic Effect of Current" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Electromagnetic Induction" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Geometrical Optics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Physical Optics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Introduction to Modern Physics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Atomic Models & Nuclear Physics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Semiconductors & Electronics" },
       { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Vectors" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Dynamics" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Newtonian Mechanics" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Work, Power & Energy" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Gravitation" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Properties of Matter" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Circular Motion" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Waves" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Kinetic Theory of Gases" },
@@ -350,97 +343,524 @@
       { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Real Numbers & Inequalities" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Linear Programming" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Complex Numbers" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Polynomials & Equations" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Binomial Expansion" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Conics" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Inverse Trigonometry" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Statics" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Dynamics of a Particle" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Probability & Statistics" },
       { subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Bangladesh & Global Context" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Communication Systems & Networking" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Number System & Digital Devices" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Web Design & HTML" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Programming Languages" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Database Management System" }
     ];
-    const weeks = []; let s=0; [13,13,13,13,13,13].forEach((sz,i)=>{ weeks.push({ id:i+1, label:`Week ${i+1}`, startIdx:s, endIdx:s+sz-1 }); s+=sz; });
-    function defaultTaskState(){ let st={}; for(let i=0;i<78;i++){ st[`${i}_cq`]=false; st[`${i}_mcq`]=false; st[`${i}_kokh`]=false; } return st; }
-
-    // UI helpers
-    function hideAllSections(){ ['plannerSection','timerSection','rankingSection','reportSection'].forEach(id=>document.getElementById(id).classList.add('hidden')); }
-    function showSection(id){ hideAllSections(); document.getElementById(id).classList.remove('hidden'); }
-
-    // pomodoro functions ...
-    function loadSettings(){ const s=localStorage.getItem('pomodoro_settings'); if(s) settings={...settings,...JSON.parse(s)}; document.getElementById('focusDuration').value=settings.focus; document.getElementById('shortBreakDuration').value=settings.shortBreak; document.getElementById('longBreakDuration').value=settings.longBreak; }
-    function saveSettings(){ localStorage.setItem('pomodoro_settings',JSON.stringify(settings)); resetTimerUI(); }
-    const savedHistory=localStorage.getItem('pomodoro_history'); sessionHistory=savedHistory?JSON.parse(savedHistory):[];
-    function addToHistory(type,duration){ sessionHistory.unshift({type,duration,completedAt:Date.now()}); if(sessionHistory.length>10) sessionHistory.pop(); localStorage.setItem('pomodoro_history',JSON.stringify(sessionHistory)); renderHistory(); updateStats(); }
-    function renderHistory(){ const cont=document.getElementById('historyList'); if(!sessionHistory.length){ cont.innerHTML='<div class="text-white/40 text-sm py-2 text-center">✨ No sessions yet</div>'; return; } cont.innerHTML=sessionHistory.map(h=>`<div class="flex justify-between text-sm p-3 bg-white/5 rounded-xl border border-white/5"><span>${h.type==='focus'?'🎯 Focus':h.type==='shortBreak'?'☕ Short':'🌿 Long'}</span><span class="font-mono">${h.duration} min</span><span class="text-white/40 text-xs">${Math.floor((Date.now()-h.completedAt)/60000)}m ago</span></div>`).join(''); }
-    function updateStats(){ const today=new Date().toDateString(); const todayFocus=sessionHistory.filter(h=>new Date(h.completedAt).toDateString()===today && h.type==='focus'); document.getElementById('totalSessionsToday').innerText=todayFocus.length; document.getElementById('totalMinutesToday').innerText=todayFocus.reduce((s,h)=>s+h.duration,0); let streak=0,d=new Date(); for(let i=0;i<30;i++){ if(sessionHistory.some(h=>new Date(h.completedAt).toDateString()===d.toDateString() && h.type==='focus')) streak++; else break; d.setDate(d.getDate()-1); } document.getElementById('streakCount').innerText=streak; }
-    const circumference=2*Math.PI*45;
-    function updateTimerDisplay(){ const m=Math.floor(timeRemaining/60),s=timeRemaining%60; document.getElementById('timerDisplay').innerText=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; const total=settings[currentSessionType]*60; const offset=circumference-(timeRemaining/total)*circumference; document.getElementById('timerRing').style.strokeDashoffset=offset; }
-    function setSessionLabel(){ const labels={focus:'🔥 Focus Session',shortBreak:'☕ Short Break',longBreak:'🌿 Long Break'}; document.getElementById('sessionLabel').innerText=labels[currentSessionType]; }
-    function playBeep(){ try{ const audioCtx=new (window.AudioContext||window.webkitAudioContext)(); const osc=audioCtx.createOscillator(); const gain=audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value=880; gain.gain.value=0.3; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime+1); osc.stop(audioCtx.currentTime+1); audioCtx.resume(); }catch(e){} }
-    function resetTimerUI(){ if(timerInterval) clearInterval(timerInterval); timerInterval=null; timeRemaining=settings[currentSessionType]*60; updateTimerDisplay(); setSessionLabel(); }
-    function startTimer(){ if(timerInterval) clearInterval(timerInterval); timerInterval=setInterval(()=>{ if(timeRemaining<=1){ clearInterval(timerInterval); timerInterval=null; playBeep(); const duration=settings[currentSessionType]; addToHistory(currentSessionType,duration); if(currentSessionType==='focus' && currentUser && !isAdmin){ db.ref(`users/${currentUser.uid}/info`).transaction(info=>{ if(!info) info={totalMinutes:0}; info.totalMinutes=(info.totalMinutes||0)+duration; return info; }); saveFocusMinutesToWeekly(currentUser.uid,duration); } if(currentSessionType==='focus'){ totalFocusSessionsCompleted++; currentSessionType=(totalFocusSessionsCompleted%4===0)?'longBreak':'shortBreak'; } else { currentSessionType='focus'; } timeRemaining=settings[currentSessionType]*60; updateTimerDisplay(); setSessionLabel(); startTimer(); } else { timeRemaining--; updateTimerDisplay(); } },1000); }
-    function switchSession(type){ if(timerInterval) clearInterval(timerInterval); timerInterval=null; currentSessionType=type; timeRemaining=settings[type]*60; updateTimerDisplay(); setSessionLabel(); document.querySelectorAll('.session-tab').forEach(tab=>{ tab.classList.toggle('bg-yellow-500/40',tab.dataset.session===type); }); }
-
-    async function saveFocusMinutesToWeekly(uid,minutes){ const now=new Date(); const day=now.getDay(); const start=new Date(now); start.setDate(now.getDate()-(day===0?6:day-1)); start.setHours(0,0,0,0); const weekKey=`${start.getFullYear()}-${start.getMonth()+1}-${start.getDate()}`; await db.ref(`users/${uid}/weeklyReport/${weekKey}/days/${now.toISOString().slice(0,10)}`).transaction(c=>(c||0)+minutes); }
-
-    // planner & ranking ...
-    function buildWeekButtons(){ const cont=document.getElementById('weekButtons'); cont.innerHTML=''; const all=document.createElement('button'); all.className='bg-yellow-500/30 px-4 py-2 rounded-full text-sm'; all.innerText='All weeks'; all.onclick=()=>{ activeWeek=null; reloadPlanner(); }; cont.appendChild(all); weeks.forEach(w=>{ const btn=document.createElement('button'); btn.className='bg-white/5 px-4 py-2 rounded-full text-sm hover:bg-white/15'; btn.innerText=w.label; btn.onclick=()=>{ activeWeek=(activeWeek===w.id)?null:w.id; reloadPlanner(); }; cont.appendChild(btn); }); }
-    function reloadPlanner(){ if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value',sn=>renderPlanner(sn.val()||defaultTaskState(),true)); }
+    const weeks = [];
+    let s = 0;
+    [13,13,13,13,13,13].forEach((sz, i) => { weeks.push({ id: i+1, label: `Week ${i+1}`, startIdx: s, endIdx: s+sz-1 }); s += sz; });
     
-    function renderPlanner(tasks,readOnly){
-      const container=document.getElementById('plannerContainer'); container.innerHTML=''; if(!tasks) return;
-      let totalDone=0;
-      for(let w of weeks){ if(activeWeek && activeWeek!==w.id) continue;
-        const weekDiv=document.createElement('div'); weekDiv.className='glass-card p-5 border border-yellow-500/10';
-        weekDiv.innerHTML=`<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-yellow-300 text-lg">${w.label}</h3><span class="text-sm bg-black/30 px-3 py-1 rounded-full">${w.endIdx-w.startIdx+1} chapters</span></div><div id="week-${w.id}" class="space-y-3"></div>`;
-        container.appendChild(weekDiv); const sub=weekDiv.querySelector(`#week-${w.id}`);
-        for(let idx=w.startIdx; idx<=w.endIdx; idx++){ const chap=allChapters[idx]; if(currentSubject!=='all' && chap.subject!==currentSubject) continue;
-          const card=document.createElement('div'); card.className='p-4 rounded-2xl bg-white/5 border-l-4 border-yellow-500/60 hover:bg-white/10 transition';
-          const cq=tasks[`${idx}_cq`]||false, mcq=tasks[`${idx}_mcq`]||false, kokh=tasks[`${idx}_kokh`]||false;
-          if(cq) totalDone++; if(mcq) totalDone++; if(kokh) totalDone++;
-          card.innerHTML=`<div class="flex justify-between items-start flex-wrap"><div><span class="text-xs text-white/50">${chap.subject}</span><div class="font-medium">${chap.chapter}</div></div><div class="flex gap-4 mt-2"><label class="flex items-center gap-1.5 text-xs"><input type="checkbox" ${cq?'checked':''} data-idx="${idx}" data-type="cq" ${readOnly?'disabled':''}> CQ</label><label class="flex items-center gap-1.5 text-xs"><input type="checkbox" ${mcq?'checked':''} data-idx="${idx}" data-type="mcq" ${readOnly?'disabled':''}> MCQ</label><label class="flex items-center gap-1.5 text-xs"><input type="checkbox" ${kokh?'checked':''} data-idx="${idx}" data-type="kokh" ${readOnly?'disabled':''}> KOKH</label></div></div>`;
+    function defaultTaskState() {
+      let st = {};
+      for (let i = 0; i < 78; i++) { st[`${i}_cq`] = false; st[`${i}_mcq`] = false; st[`${i}_kokh`] = false; }
+      return st;
+    }
+
+    // ========== UI HELPERS ==========
+    function hideAllSections() {
+      ['plannerSection','timerSection','rankingSection','reportSection'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+    }
+    function showSection(id) {
+      hideAllSections();
+      document.getElementById(id).classList.remove('hidden');
+    }
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
+    }
+
+    // ========== POMODORO ==========
+    function loadSettings() {
+      const saved = localStorage.getItem('pomodoro_settings');
+      if (saved) settings = { ...settings, ...JSON.parse(saved) };
+      document.getElementById('focusDuration').value = settings.focus;
+      document.getElementById('shortBreakDuration').value = settings.shortBreak;
+      document.getElementById('longBreakDuration').value = settings.longBreak;
+    }
+    function saveSettingsToStorage() {
+      localStorage.setItem('pomodoro_settings', JSON.stringify(settings));
+      resetTimerUI();
+    }
+    const savedHistory = localStorage.getItem('pomodoro_history');
+    sessionHistory = savedHistory ? JSON.parse(savedHistory) : [];
+    
+    function addToHistory(type, duration) {
+      sessionHistory.unshift({ type, duration, completedAt: Date.now() });
+      if (sessionHistory.length > 10) sessionHistory.pop();
+      localStorage.setItem('pomodoro_history', JSON.stringify(sessionHistory));
+      renderHistory();
+      updateStats();
+    }
+    function renderHistory() {
+      const cont = document.getElementById('historyList');
+      if (!sessionHistory.length) {
+        cont.innerHTML = '<div class="text-white/40 text-sm py-2 text-center">✨ No sessions yet</div>';
+        return;
+      }
+      cont.innerHTML = sessionHistory.map(h => `
+        <div class="flex justify-between text-sm p-3 bg-white/5 rounded-xl border border-white/5">
+          <span>${h.type==='focus'?'🎯 Focus':h.type==='shortBreak'?'☕ Short':'🌿 Long'}</span>
+          <span class="font-mono">${h.duration} min</span>
+          <span class="text-white/40 text-xs">${Math.floor((Date.now()-h.completedAt)/60000)}m ago</span>
+        </div>
+      `).join('');
+    }
+    function updateStats() {
+      const today = new Date().toDateString();
+      const todayFocus = sessionHistory.filter(h => new Date(h.completedAt).toDateString() === today && h.type === 'focus');
+      document.getElementById('totalSessionsToday').innerText = todayFocus.length;
+      document.getElementById('totalMinutesToday').innerText = todayFocus.reduce((sum, h) => sum + h.duration, 0);
+      let streak = 0, d = new Date();
+      for (let i = 0; i < 30; i++) {
+        if (sessionHistory.some(h => new Date(h.completedAt).toDateString() === d.toDateString() && h.type === 'focus')) streak++;
+        else break;
+        d.setDate(d.getDate() - 1);
+      }
+      document.getElementById('streakCount').innerText = streak;
+    }
+    const circumference = 2 * Math.PI * 45;
+    function updateTimerDisplay() {
+      const m = Math.floor(timeRemaining / 60);
+      const s = timeRemaining % 60;
+      document.getElementById('timerDisplay').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+      const total = settings[currentSessionType] * 60;
+      const offset = circumference - (timeRemaining / total) * circumference;
+      document.getElementById('timerRing').style.strokeDashoffset = offset;
+    }
+    function setSessionLabel() {
+      const labels = { focus: '🔥 Focus Session', shortBreak: '☕ Short Break', longBreak: '🌿 Long Break' };
+      document.getElementById('sessionLabel').innerText = labels[currentSessionType];
+    }
+    function playBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = 880; gain.gain.value = 0.3;
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 1);
+        osc.stop(audioCtx.currentTime + 1);
+        audioCtx.resume();
+      } catch(e) {}
+    }
+    function resetTimerUI() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = null;
+      timeRemaining = settings[currentSessionType] * 60;
+      updateTimerDisplay();
+      setSessionLabel();
+    }
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (timeRemaining <= 1) {
+          clearInterval(timerInterval); timerInterval = null;
+          playBeep();
+          const duration = settings[currentSessionType];
+          addToHistory(currentSessionType, duration);
+          
+          if (currentSessionType === 'focus' && currentUser && !isAdmin) {
+            db.ref(`users/${currentUser.uid}/info`).transaction(info => {
+              if (!info) info = { totalMinutes: 0 };
+              info.totalMinutes = (info.totalMinutes || 0) + duration;
+              return info;
+            });
+            saveFocusMinutesToWeekly(currentUser.uid, duration);
+          }
+          
+          if (currentSessionType === 'focus') {
+            totalFocusSessionsCompleted++;
+            currentSessionType = (totalFocusSessionsCompleted % 4 === 0) ? 'longBreak' : 'shortBreak';
+          } else {
+            currentSessionType = 'focus';
+          }
+          timeRemaining = settings[currentSessionType] * 60;
+          updateTimerDisplay();
+          setSessionLabel();
+          startTimer();
+        } else {
+          timeRemaining--;
+          updateTimerDisplay();
+        }
+      }, 1000);
+    }
+    function switchSession(type) {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = null;
+      currentSessionType = type;
+      timeRemaining = settings[type] * 60;
+      updateTimerDisplay();
+      setSessionLabel();
+      document.querySelectorAll('.session-tab').forEach(tab => {
+        tab.classList.toggle('bg-yellow-500/40', tab.dataset.session === type);
+        tab.classList.toggle('text-white', tab.dataset.session === type);
+      });
+    }
+    async function saveFocusMinutesToWeekly(uid, minutes) {
+      const now = new Date();
+      const day = now.getDay();
+      const start = new Date(now);
+      start.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+      start.setHours(0,0,0,0);
+      const weekKey = `${start.getFullYear()}-${start.getMonth()+1}-${start.getDate()}`;
+      const dateStr = now.toISOString().slice(0,10);
+      await db.ref(`users/${uid}/weeklyReport/${weekKey}/days/${dateStr}`).transaction(c => (c || 0) + minutes);
+    }
+
+    // ========== WEEKLY REPORT ==========
+    async function loadWeeklyReport(uid, offset) {
+      const now = new Date();
+      const day = now.getDay();
+      let start = new Date(now);
+      start.setDate(now.getDate() - (day === 0 ? 6 : day - 1) + offset * 7);
+      start.setHours(0,0,0,0);
+      const weekKey = `${start.getFullYear()}-${start.getMonth()+1}-${start.getDate()}`;
+      const daysSnap = await db.ref(`users/${uid}/weeklyReport/${weekKey}/days`).once('value');
+      const daysData = daysSnap.val() || {};
+      const daily = [];
+      let total = 0;
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        const mins = daysData[d.toISOString().slice(0,10)] || 0;
+        daily.push(mins);
+        total += mins;
+      }
+      const tasksSnap = await db.ref(`users/${uid}/tasks`).once('value');
+      const tasks = tasksSnap.val() || {};
+      let completed = 0;
+      for (let i = 0; i < 78; i++) {
+        if (tasks[`${i}_cq`]) completed++;
+        if (tasks[`${i}_mcq`]) completed++;
+        if (tasks[`${i}_kokh`]) completed++;
+      }
+      return { weekKey, startDate: start, endDate: new Date(start.getTime() + 6*86400000), dailyMinutes: daily, totalMinutes: total, completedTasks: completed, totalTasks: 234 };
+    }
+    function renderReport(report) {
+      if (!report) return;
+      const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      const maxMin = Math.max(...report.dailyMinutes, 10);
+      let bars = '';
+      for (let i = 0; i < 7; i++) {
+        const p = (report.dailyMinutes[i] / maxMin) * 100;
+        bars += `<div class="flex-1 text-center"><div class="h-32 flex items-end justify-center"><div class="w-full max-w-[40px] bg-gradient-to-t from-yellow-500 to-amber-500 rounded-t-lg transition-all" style="height: ${p}%; min-height:4px;"></div></div><div class="text-xs mt-2">${days[i]}</div><div class="text-xs font-bold text-yellow-400">${report.dailyMinutes[i]} min</div></div>`;
+      }
+      const startStr = `${report.startDate.getDate()}/${report.startDate.getMonth()+1}`;
+      const endStr = `${report.endDate.getDate()}/${report.endDate.getMonth()+1}`;
+      const percent = Math.round((report.completedTasks / report.totalTasks) * 100);
+      document.getElementById('reportContent').innerHTML = `
+        <div class="text-center mb-4"><span class="text-lg font-semibold">${startStr} - ${endStr}</span><span class="ml-3 text-sm bg-yellow-500/20 px-3 py-1 rounded-full">Week ${report.weekKey}</span></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="glass-card p-4"><h3 class="font-bold mb-3">📈 Daily Focus Minutes</h3><div class="flex justify-between items-end gap-1 h-40">${bars}</div><div class="mt-4 text-center"><span class="text-2xl font-bold text-yellow-400">${report.totalMinutes}</span> <span class="text-white/60">minutes</span></div></div>
+          <div class="glass-card p-4 space-y-4">
+            <div><h3 class="font-bold mb-2">✅ Task Progress</h3><div class="flex justify-between text-sm"><span>Completed: ${report.completedTasks}</span><span>Total: ${report.totalTasks}</span></div><div class="h-2 bg-white/10 rounded-full"><div class="h-full bg-yellow-500 rounded-full" style="width:${percent}%"></div></div></div>
+            <div><h3 class="font-bold mb-2">🎯 Weekly Goal</h3><div class="flex justify-between"><span>Focus minutes</span><span>${report.totalMinutes} / 500</span></div><div class="h-2 bg-white/10 rounded-full"><div class="h-full bg-gradient-to-r from-yellow-500 to-amber-500 rounded-full" style="width:${Math.min(100,(report.totalMinutes/500)*100)}%"></div></div></div>
+          </div>
+        </div>`;
+    }
+    async function refreshReport(uid, offset) {
+      if (!uid) return;
+      const r = await loadWeeklyReport(uid, offset);
+      renderReport(r);
+    }
+
+    // ========== PLANNER ==========
+    function buildWeekButtons() {
+      const cont = document.getElementById('weekButtons');
+      cont.innerHTML = '';
+      const allBtn = document.createElement('button');
+      allBtn.className = 'bg-yellow-500/30 px-4 py-2 rounded-full text-sm';
+      allBtn.innerText = 'All weeks';
+      allBtn.onclick = () => { activeWeek = null; reloadPlanner(); };
+      cont.appendChild(allBtn);
+      weeks.forEach(w => {
+        const btn = document.createElement('button');
+        btn.className = 'bg-white/5 px-4 py-2 rounded-full text-sm hover:bg-white/15';
+        btn.innerText = w.label;
+        btn.onclick = () => { activeWeek = (activeWeek === w.id) ? null : w.id; reloadPlanner(); };
+        cont.appendChild(btn);
+      });
+    }
+    function reloadPlanner() {
+      if (currentUser && !isAdmin) loadMemberTasks(currentUser);
+      else if (isAdmin && viewingUserId) {
+        db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val() || defaultTaskState(), true));
+      }
+    }
+    function renderPlanner(tasks, readOnly = false) {
+      const container = document.getElementById('plannerContainer');
+      container.innerHTML = '';
+      if (!tasks) return;
+      let totalDone = 0;
+      for (let w of weeks) {
+        if (activeWeek && activeWeek !== w.id) continue;
+        const weekDiv = document.createElement('div');
+        weekDiv.className = 'glass-card p-5 border border-yellow-500/10';
+        weekDiv.innerHTML = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-yellow-300 text-lg">${w.label}</h3><span class="text-sm bg-black/30 px-3 py-1 rounded-full">${w.endIdx-w.startIdx+1} chapters</span></div><div id="week-${w.id}" class="space-y-3"></div>`;
+        container.appendChild(weekDiv);
+        const sub = weekDiv.querySelector(`#week-${w.id}`);
+        for (let idx = w.startIdx; idx <= w.endIdx; idx++) {
+          const chap = allChapters[idx];
+          if (currentSubject !== 'all' && chap.subject !== currentSubject) continue;
+          const cq = tasks[`${idx}_cq`] || false;
+          const mcq = tasks[`${idx}_mcq`] || false;
+          const kokh = tasks[`${idx}_kokh`] || false;
+          if (cq) totalDone++; if (mcq) totalDone++; if (kokh) totalDone++;
+          const card = document.createElement('div');
+          card.className = 'p-4 rounded-2xl bg-white/5 border-l-4 border-yellow-500/60 hover:bg-white/10 transition';
+          card.innerHTML = `
+            <div class="flex justify-between items-start flex-wrap">
+              <div><span class="text-xs text-white/50">${chap.subject}</span><div class="font-medium">${chap.chapter}</div></div>
+              <div class="flex gap-4 mt-2">
+                <label class="flex items-center gap-1.5 text-xs"><input type="checkbox" ${cq?'checked':''} data-idx="${idx}" data-type="cq" ${readOnly?'disabled':''}> CQ</label>
+                <label class="flex items-center gap-1.5 text-xs"><input type="checkbox" ${mcq?'checked':''} data-idx="${idx}" data-type="mcq" ${readOnly?'disabled':''}> MCQ</label>
+                <label class="flex items-center gap-1.5 text-xs"><input type="checkbox" ${kokh?'checked':''} data-idx="${idx}" data-type="kokh" ${readOnly?'disabled':''}> KOKH</label>
+              </div>
+            </div>`;
           sub.appendChild(card);
-          if(!readOnly && !isAdmin){ card.querySelectorAll('input').forEach(inp=>{ inp.addEventListener('change',()=>{ tasks[`${idx}_${inp.dataset.type}`]=inp.checked; db.ref(`users/${currentUser.uid}/tasks`).set(tasks); renderPlanner(tasks,false); }); }); }
+          if (!readOnly && !isAdmin) {
+            card.querySelectorAll('input').forEach(inp => {
+              inp.addEventListener('change', () => {
+                tasks[`${idx}_${inp.dataset.type}`] = inp.checked;
+                db.ref(`users/${currentUser.uid}/tasks`).set(tasks);
+                renderPlanner(tasks, false);
+              });
+            });
+          }
         }
       }
-      const percent=Math.round((totalDone/234)*100); document.getElementById('pgBar').style.width=percent+'%'; document.getElementById('pgTxtShort').innerText=percent+'%';
+      const percent = Math.round((totalDone / 234) * 100);
+      document.getElementById('pgBar').style.width = percent + '%';
+      document.getElementById('pgTxtShort').innerText = percent + '%';
+      document.getElementById('totalTaskDisplay').innerText = '234';
+    }
+    async function loadMemberTasks(user) {
+      if (!user) return;
+      const snap = await db.ref(`users/${user.uid}/tasks`).once('value');
+      let tasks = snap.val() || defaultTaskState();
+      renderPlanner(tasks, false);
+      await db.ref(`users/${user.uid}/info`).update({
+        email: user.email,
+        googleName: user.displayName || user.email,
+        lastLogin: Date.now()
+      });
     }
 
-    async function loadMemberTasks(user){ if(!user) return; const snap=await db.ref(`users/${user.uid}/tasks`).once('value'); let tasks=snap.val()||defaultTaskState(); renderPlanner(tasks,false); await db.ref(`users/${user.uid}/info`).update({ email:user.email, googleName:user.displayName||user.email, lastLogin:Date.now() }); }
-
-    function renderRanking(snap){ const users=snap.val()||{}; const list=[]; for(let uid in users){ const info=users[uid].info||{}; const name=info.nickname||info.googleName||info.email||uid.slice(0,8); list.push({name,mins:info.totalMinutes||0}); } list.sort((a,b)=>b.mins-a.mins); const cont=document.getElementById('rankingList'); cont.innerHTML=list.map((u,i)=>`<div class="flex justify-between p-4 glass-card rounded-xl"><span>${i+1}. ${escapeHtml(u.name)}</span><span class="text-yellow-400 font-bold">${u.mins} min</span></div>`).join('')||'<div class="text-center py-8">No data</div>'; }
-    function escapeHtml(s){ return String(s).replace(/[&<>]/g,c=> ({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]); }
-
-    async function loadMemberList(){
-      const snap=await db.ref('users').once('value'); const users=snap.val()||{};
-      let html='<table class="w-full text-sm admin-table"><thead><tr><th>Member</th><th>⏱️ Mins</th><th>✅ Tasks</th><th></th></tr></thead><tbody>';
-      for(let uid in users){ const info=users[uid].info||{}; const name=info.nickname||info.googleName||info.email||uid; const mins=info.totalMinutes||0; const tasks=users[uid].tasks||{}; let done=0; for(let i=0;i<78;i++){ if(tasks[`${i}_cq`]) done++; if(tasks[`${i}_mcq`]) done++; if(tasks[`${i}_kokh`]) done++; } html+=`<tr><td>${escapeHtml(name)}</td><td>${mins}</td><td>${done}/234</td><td><button class="view-badge view-user-btn" data-uid="${uid}">🔍 View</button></td></tr>`; }
-      html+='</tbody></table>'; document.getElementById('adminUserListContainer').innerHTML=html;
-      document.querySelectorAll('.view-user-btn').forEach(btn=>{ btn.onclick=()=>{ viewingUserId=btn.dataset.uid; db.ref(`users/${viewingUserId}/tasks`).once('value',sn=>renderPlanner(sn.val()||defaultTaskState(),true)); document.getElementById('adminUserListContainer').style.display='none'; document.getElementById('adminBackToListBtn').classList.remove('hidden'); document.getElementById('memberHomeBtn').classList.add('hidden'); showSection('plannerSection'); }; });
+    // ========== RANKING ==========
+    function renderRanking(snap) {
+      const users = snap.val() || {};
+      const list = [];
+      for (let uid in users) {
+        const info = users[uid].info || {};
+        const name = info.nickname || info.googleName || info.email || uid.slice(0,8);
+        const mins = info.totalMinutes || 0;
+        list.push({ name, mins });
+      }
+      list.sort((a,b) => b.mins - a.mins);
+      const cont = document.getElementById('rankingList');
+      if (list.length === 0) {
+        cont.innerHTML = '<div class="text-center text-white/40 py-8">No users yet</div>';
+        return;
+      }
+      cont.innerHTML = list.map((u, i) => `
+        <div class="flex justify-between p-4 glass-card rounded-xl">
+          <span>${i+1}. ${escapeHtml(u.name)}</span>
+          <span class="text-yellow-400 font-bold">${u.mins} min</span>
+        </div>
+      `).join('');
+    }
+    function startRankingListener() {
+      if (rankUnsub) rankUnsub();
+      rankUnsub = db.ref('users').on('value', snap => renderRanking(snap));
+    }
+    function stopRankingListener() {
+      if (rankUnsub) { rankUnsub(); rankUnsub = null; }
     }
 
-    // EVENT LISTENERS
-    document.getElementById('roleSelect').addEventListener('change',e=>{
-      if(e.target.value==='admin'){ document.getElementById('memberLoginArea').classList.add('hidden'); document.getElementById('adminLoginArea').classList.remove('hidden'); }
-      else { document.getElementById('memberLoginArea').classList.remove('hidden'); document.getElementById('adminLoginArea').classList.add('hidden'); }
+    // ========== ADMIN MEMBER LIST ==========
+    async function loadMemberList() {
+      if (!isAdmin) return;
+      const snap = await db.ref('users').once('value');
+      const users = snap.val() || {};
+      let html = `<table class="w-full text-sm admin-table"><thead><tr><th>Member</th><th>⏱️ Mins</th><th>✅ Tasks</th><th></th></tr></thead><tbody>`;
+      for (let uid in users) {
+        const info = users[uid].info || {};
+        const name = info.nickname || info.googleName || info.email || uid;
+        const mins = info.totalMinutes || 0;
+        const tasks = users[uid].tasks || {};
+        let done = 0;
+        for (let i=0; i<78; i++) {
+          if (tasks[`${i}_cq`]) done++;
+          if (tasks[`${i}_mcq`]) done++;
+          if (tasks[`${i}_kokh`]) done++;
+        }
+        html += `<tr><td>${escapeHtml(name)}</td><td>${mins}</td><td>${done}/234</td><td><button class="view-badge view-user-btn" data-uid="${uid}">🔍 View</button></td></tr>`;
+      }
+      html += `</tbody></table>`;
+      document.getElementById('adminUserListContainer').innerHTML = html;
+      document.querySelectorAll('.view-user-btn').forEach(btn => {
+        btn.onclick = () => {
+          viewingUserId = btn.dataset.uid;
+          db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val() || defaultTaskState(), true));
+          document.getElementById('adminUserListContainer').style.display = 'none';
+          document.getElementById('adminBackToListBtn').classList.remove('hidden');
+          document.getElementById('memberHomeBtn').classList.add('hidden');
+          showSection('plannerSection');
+          document.getElementById('adminStatus').innerText = `Viewing: ${viewingUserId.slice(0,8)}`;
+        };
+      });
+    }
+
+    // ========== EVENT LISTENERS & INIT ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      // Role select toggle
+      document.getElementById('roleSelect').addEventListener('change', e => {
+        const isMember = e.target.value === 'member';
+        document.getElementById('memberLoginArea').classList.toggle('hidden', !isMember);
+        document.getElementById('adminLoginArea').classList.toggle('hidden', isMember);
+      });
+
+      // Google Sign-In
+      document.getElementById('googleSignInBtn').addEventListener('click', async () => {
+        const errorMsg = document.getElementById('loginErrorMsg');
+        errorMsg.classList.add('hidden');
+        try {
+          await auth.signInWithPopup(googleProvider);
+        } catch (error) {
+          console.error("Google Sign-In Error:", error);
+          errorMsg.classList.remove('hidden');
+          if (error.code === 'auth/popup-blocked') errorMsg.innerText = 'Popup blocked. Allow popups.';
+          else if (error.code === 'auth/unauthorized-domain') errorMsg.innerText = 'Domain not authorized. Add in Firebase Console.';
+          else if (error.code === 'auth/operation-not-allowed') errorMsg.innerText = 'Google sign-in not enabled in Firebase.';
+          else errorMsg.innerText = `Login failed: ${error.message}`;
+        }
+      });
+
+      // Admin login
+      document.getElementById('adminLoginBtn').onclick = () => {
+        if (document.getElementById('adminPassword').value === 'dormant2025') {
+          isAdmin = true;
+          currentUser = null;
+          document.getElementById('loginPanel').classList.add('hidden');
+          document.getElementById('adminPanel').classList.remove('hidden');
+          document.getElementById('userStatusArea').innerHTML = `<span class="bg-yellow-500/20 px-4 py-1.5 rounded-full text-sm">👑 Admin</span><button id="adminLogout" class="text-xs bg-white/10 px-4 py-2 rounded-full">Logout</button>`;
+          document.getElementById('adminLogout').onclick = () => location.reload();
+          startRankingListener();
+          showSection('timerSection');
+          loadMemberList();
+          document.getElementById('adminUserListContainer').style.display = 'block';
+        } else alert('Wrong password');
+      };
+
+      // Auth state observer
+      auth.onAuthStateChanged(async user => {
+        if (user && !isAdmin) {
+          currentUser = user;
+          document.getElementById('loginPanel').classList.add('hidden');
+          document.getElementById('adminPanel').classList.add('hidden');
+          document.getElementById('userStatusArea').innerHTML = `
+            <span class="text-sm">👋 ${user.displayName || user.email}</span>
+            <button id="userLogout" class="bg-white/10 px-4 py-2 rounded-full text-sm">Logout</button>
+            <button id="editNicknameBtn" class="bg-yellow-500/20 px-4 py-2 rounded-full text-sm">✏️ Name</button>
+          `;
+          document.getElementById('userLogout').onclick = () => auth.signOut();
+          document.getElementById('editNicknameBtn').onclick = async () => {
+            const newNick = prompt('Enter display name:');
+            if (newNick) await db.ref(`users/${currentUser.uid}/info`).update({ nickname: newNick });
+          };
+          await loadMemberTasks(user);
+          startRankingListener();
+          showSection('timerSection');
+        } else if (!user && !isAdmin) {
+          document.getElementById('loginPanel').classList.remove('hidden');
+          document.getElementById('userStatusArea').innerHTML = '';
+          stopRankingListener();
+        }
+      });
+
+      // Section navigation
+      document.getElementById('showPlannerBtn').onclick = () => {
+        showSection('plannerSection');
+        if (currentUser && !isAdmin) loadMemberTasks(currentUser);
+        else if (isAdmin && viewingUserId) reloadPlanner();
+        else if (isAdmin) document.getElementById('plannerContainer').innerHTML = '<div class="text-center py-10 text-white/40">Select a member from list</div>';
+      };
+      document.getElementById('showTimerBtn').onclick = () => showSection('timerSection');
+      document.getElementById('showRankingBtn').onclick = () => showSection('rankingSection');
+      document.getElementById('showReportBtn').onclick = () => {
+        showSection('reportSection');
+        if (currentUser && !isAdmin) refreshReport(currentUser.uid, reportWeekOffset);
+      };
+      document.getElementById('prevWeekBtn').onclick = () => { reportWeekOffset++; if (currentUser) refreshReport(currentUser.uid, reportWeekOffset); };
+      document.getElementById('nextWeekBtn').onclick = () => { reportWeekOffset--; if (currentUser) refreshReport(currentUser.uid, reportWeekOffset); };
+      document.getElementById('currentWeekBtn').onclick = () => { reportWeekOffset = 0; if (currentUser) refreshReport(currentUser.uid, 0); };
+
+      // Admin panel actions
+      document.getElementById('memberListBtn').onclick = () => {
+        loadMemberList();
+        document.getElementById('adminUserListContainer').style.display = 'block';
+      };
+      document.getElementById('adminBackToListBtn').onclick = () => {
+        viewingUserId = null;
+        document.getElementById('adminBackToListBtn').classList.add('hidden');
+        loadMemberList();
+        document.getElementById('adminUserListContainer').style.display = 'block';
+        document.getElementById('plannerContainer').innerHTML = '<div class="text-center py-10 text-white/40">Select a member</div>';
+      };
+      document.getElementById('exportAllDataBtn').onclick = () => {
+        db.ref('users').once('value', snap => {
+          const blob = new Blob([JSON.stringify(snap.val(), null, 2)], {type: 'application/json'});
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = `dormant_export_${Date.now()}.json`;
+          a.click();
+        });
+      };
+      document.getElementById('homeBtn').onclick = () => {
+        document.getElementById('adminUserListContainer').style.display = 'none';
+      };
+      document.getElementById('memberHomeBtn').onclick = () => {
+        if (currentUser) loadMemberTasks(currentUser);
+      };
+
+      // Pomodoro controls
+      document.getElementById('startTimerBtn').onclick = startTimer;
+      document.getElementById('pauseTimerBtn').onclick = () => { if(timerInterval) clearInterval(timerInterval); timerInterval = null; };
+      document.getElementById('resetTimerBtn').onclick = resetTimerUI;
+      document.querySelectorAll('.session-tab').forEach(btn => btn.onclick = () => switchSession(btn.dataset.session));
+      document.getElementById('openSettingsBtn').onclick = () => document.getElementById('settingsModal').classList.remove('hidden');
+      document.getElementById('closeSettingsBtn').onclick = () => document.getElementById('settingsModal').classList.add('hidden');
+      document.getElementById('saveSettingsBtn').onclick = () => {
+        settings.focus = +document.getElementById('focusDuration').value;
+        settings.shortBreak = +document.getElementById('shortBreakDuration').value;
+        settings.longBreak = +document.getElementById('longBreakDuration').value;
+        saveSettingsToStorage();
+        document.getElementById('settingsModal').classList.add('hidden');
+      };
+
+      // Subject filter
+      document.getElementById('subjectFilter').onchange = (e) => {
+        currentSubject = e.target.value;
+        reloadPlanner();
+      };
+
+      // Download button
+      document.getElementById('downloadBtn').onclick = () => {
+        const blob = new Blob([document.documentElement.outerHTML], {type: 'text/html'});
+        const a = document.createElement('a');
+        a.download = 'dormant_beast.html';
+        a.href = URL.createObjectURL(blob);
+        a.click();
+      };
+
+      // Initialize
+      buildWeekButtons();
+      loadSettings();
+      resetTimerUI();
+      renderHistory();
+      updateStats();
+      startRankingListener();
+      showSection('timerSection');
     });
-    document.getElementById('showPlannerBtn').onclick=()=>{ showSection('plannerSection'); if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) reloadPlanner(); };
-    document.getElementById('showTimerBtn').onclick=()=>showSection('timerSection');
-    document.getElementById('showRankingBtn').onclick=()=>showSection('rankingSection');
-    document.getElementById('showReportBtn').onclick=()=>{ showSection('reportSection'); if(currentUser&&!isAdmin) refreshReport(currentUser.uid,reportWeekOffset); };
-    
-    // admin login
-    document.getElementById('adminLoginBtn').onclick=()=>{ if(document.getElementById('adminPassword').value==='dormant2025'){ isAdmin=true; currentUser=null; document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); document.getElementById('userStatusArea').innerHTML='<span class="bg-yellow-500/20 px-4 py-1.5 rounded-full text-sm">👑 Admin</span><button id="adminLogout" class="text-xs bg-white/10 px-4 py-2 rounded-full">Logout</button>'; document.getElementById('adminLogout').onclick=()=>location.reload(); startRanking(); showSection('timerSection'); loadMemberList(); document.getElementById('adminUserListContainer').style.display='block'; } else alert('Wrong password'); };
-    
-    auth.onAuthStateChanged(async user=>{ if(user && !isAdmin){ currentUser=user; document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('adminPanel').classList.add('hidden'); document.getElementById('userStatusArea').innerHTML=`<span>👋 ${user.displayName||user.email}</span><button id="userLogout" class="bg-white/10 px-4 py-2 rounded-full">Logout</button>`; document.getElementById('userLogout').onclick=()=>auth.signOut(); await loadMemberTasks(user); startRanking(); showSection('timerSection'); } else if(!user && !isAdmin){ document.getElementById('loginPanel').classList.remove('hidden'); } });
-    
-    function startRanking(){ if(rankUnsub) rankUnsub(); rankUnsub=db.ref('users').on('value',snap=>renderRanking(snap)); }
-    
-    document.getElementById('memberListBtn').onclick=()=>{ loadMemberList(); document.getElementById('adminUserListContainer').style.display='block'; };
-    document.getElementById('adminBackToListBtn').onclick=()=>{ viewingUserId=null; document.getElementById('adminBackToListBtn').classList.add('hidden'); loadMemberList(); document.getElementById('adminUserListContainer').style.display='block'; };
-    document.getElementById('exportAllDataBtn').onclick=()=>{ db.ref('users').once('value',snap=>{ const blob=new Blob([JSON.stringify(snap.val(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`dormant_export_${Date.now()}.json`; a.click(); }); };
-    
-    // Timer controls
-    document.getElementById('startTimerBtn').onclick=startTimer; document.getElementById('pauseTimerBtn').onclick=()=>{ if(timerInterval) clearInterval(timerInterval); timerInterval=null; }; document.getElementById('resetTimerBtn').onclick=resetTimerUI;
-    document.querySelectorAll('.session-tab').forEach(btn=>btn.onclick=()=>switchSession(btn.dataset.session));
-    document.getElementById('openSettingsBtn').onclick=()=>document.getElementById('settingsModal').classList.remove('hidden');
-    document.getElementById('closeSettingsBtn').onclick=()=>document.getElementById('settingsModal').classList.add('hidden');
-    document.getElementById('saveSettingsBtn').onclick=()=>{ settings.focus=+document.getElementById('focusDuration').value; settings.shortBreak=+document.getElementById('shortBreakDuration').value; settings.longBreak=+document.getElementById('longBreakDuration').value; saveSettings(); document.getElementById('settingsModal').classList.add('hidden'); };
-    
-    buildWeekButtons(); loadSettings(); resetTimerUI(); renderHistory(); updateStats(); startRanking();
-    document.getElementById('downloadBtn').onclick=()=>{ const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'}); const a=document.createElement('a'); a.download='dormant_beast.html'; a.href=URL.createObjectURL(blob); a.click(); };
-    showSection('timerSection');
   })();
 </script>
 </body>
