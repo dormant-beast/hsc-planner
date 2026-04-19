@@ -3,165 +3,176 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>HSC প্ল্যানার | প্রোফাইল নাম | DORMANT BEAST</title>
+  <title>DORMANT BEAST | ফোকাস + প্ল্যানার + র‍্যাংকিং</title>
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', 'Roboto', 'Noto Sans Bengali', sans-serif; background: #f8fafc; color: #0f172a; }
-    .red-box { background: linear-gradient(135deg, #b91c1c, #991b1b, #7f1d1d); color: white; padding: 28px 20px; text-align: center; border-bottom: 4px solid #facc15; position: relative; }
-    .red-box h1 { font-size: 26px; margin-bottom: 8px; }
-    .red-box .sub { font-size: 18px; margin-top: 6px; }
-    .red-box .total-tasks { font-size: 14px; background: rgba(0,0,0,0.3); display: inline-block; padding: 4px 14px; border-radius: 40px; margin-top: 10px; }
-    .red-box .everyday-target { font-size: 13px; background: rgba(250,204,21,0.2); display: inline-block; padding: 4px 14px; border-radius: 40px; margin-top: 8px; border: 1px solid #facc15; }
-    .prog-wrap { max-width: 460px; margin: 16px auto 0; }
-    .prog-bg { background: rgba(255,255,255,0.3); border-radius: 30px; height: 10px; overflow: hidden; }
-    .prog-fill { height: 100%; background: linear-gradient(90deg, #facc15, #f59e0b); width: 0%; transition: width 0.2s; }
-    .prog-txt { font-size: 12px; margin-top: 5px; }
-    
-    /* মেনু বাটন ও ড্রপডাউন */
-    .menu-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(0,0,0,0.3);
-      border: none;
-      color: white;
-      font-size: 28px;
-      cursor: pointer;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-      z-index: 30;
-    }
-    .menu-btn:hover { background: rgba(0,0,0,0.5); }
-    .dropdown-menu {
-      position: absolute;
-      top: 70px;
-      right: 20px;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-      overflow: hidden;
-      min-width: 200px;
-      z-index: 40;
-      display: none;
-    }
-    .dropdown-menu.show { display: block; }
-    .dropdown-menu a, .dropdown-menu button {
-      display: block;
-      width: 100%;
-      padding: 12px 20px;
-      text-align: left;
-      background: none;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      color: #1e293b;
-      text-decoration: none;
-      transition: background 0.1s;
-    }
-    .dropdown-menu a:hover, .dropdown-menu button:hover {
-      background: #f1f5f9;
-    }
-    .dropdown-menu .logout-item {
-      color: #dc2626;
-      border-top: 1px solid #e2e8f0;
-    }
-    .dropdown-menu .profile-info {
-      background: #f8fafc;
-      font-size: 14px;
-      color: #475569;
-      cursor: default;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .dropdown-menu .profile-info:hover { background: #f8fafc; }
-    
-    .login-panel { background: #1e293b; color: white; padding: 14px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; border-bottom: 2px solid #facc15; }
-    .admin-panel { background: #334155; padding: 12px 18px; display: none; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; border-bottom: 1px solid #475569; }
-    .admin-panel button, .login-panel button, .member-home-btn { background: #facc15; border: none; padding: 6px 14px; border-radius: 40px; font-weight: bold; cursor: pointer; }
-    .logout-btn { background: #ef4444 !important; color: white !important; }
-    .member-home-btn { background: #10b981 !important; color: white; margin-left: auto; }
-    .controls { background: white; padding: 12px 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 20; }
-    select, input { padding: 6px 12px; border-radius: 40px; border: 1.5px solid #cbd5e1; background: #f8fafc; }
-    .fbtns { display: flex; flex-wrap: wrap; gap: 6px; }
-    .fbtn { background: #f1f5f9; border: none; padding: 5px 14px; border-radius: 40px; font-size: 11px; font-weight: 600; cursor: pointer; }
-    .fbtn.active { background: #3b82f6; color: white; }
-    .container { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
-    .user-list { background: #0f172a; padding: 10px; border-radius: 12px; overflow-x: auto; margin: 10px 18px; display: none; color: white; }
-    .user-list table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .user-list th, .user-list td { padding: 8px; text-align: left; border-bottom: 1px solid #475569; }
-    .user-list th { background: #facc15; color: #0f172a; }
-    .view-user-btn { background: #3b82f6; padding: 2px 8px; border-radius: 20px; border: none; color: white; cursor: pointer; }
-    .viewing-banner { background: #fef3c7; color: #92400e; padding: 10px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: bold; }
-    .task-card { background: white; border-radius: 20px; padding: 16px; margin-bottom: 14px; border-left: 5px solid #94a3b8; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-    .task-header { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 8px; }
-    .task-number { background: #e2e8f0; border-radius: 40px; padding: 2px 14px; font-size: 13px; font-weight: 800; }
-    .subject-badge { padding: 4px 12px; border-radius: 30px; font-size: 11px; font-weight: 700; }
-    .chapter-name { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .complete-badge { font-size: 10px; background: #dcfce7; padding: 2px 8px; border-radius: 20px; color: #166534; }
-    .segments { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 6px; }
-    .seg-item { display: flex; align-items: center; gap: 8px; background: white; padding: 5px 12px; border-radius: 40px; border: 1px solid #e2e8f0; }
-    .seg-item input { width: 18px; height: 18px; cursor: pointer; accent-color: #22c55e; }
-    .hidden { display: none; }
-    .dl-btn { display: block; width: 90%; max-width: 360px; margin: 20px auto; background: #3b82f6; border: none; border-radius: 40px; padding: 12px; color: white; font-weight: bold; cursor: pointer; text-align: center; }
-    .google-btn { background: #fff; color: #333; border: 1px solid #ccc; display: inline-flex; align-items: center; gap: 8px; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at 10% 20%, #0b1120, #030712); }
+    .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 2rem; transition: all 0.2s; }
+    .glass-card:hover { border-color: rgba(250,204,21,0.3); background: rgba(255,255,255,0.08); }
+    .btn-glow { background: linear-gradient(135deg, #facc15, #eab308); transition: transform 0.1s; }
+    .btn-glow:hover { transform: scale(1.02); box-shadow: 0 10px 20px -5px rgba(250,204,21,0.4); }
+    .timer-ring { transition: stroke-dashoffset 0.2s linear; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #1e293b; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #facc15; border-radius: 10px; }
   </style>
 </head>
-<body>
+<body class="text-white antialiased">
 
-<div class="red-box">
-  <h1>📘 Study Planner by DORMANT BEAST</h1>
-  <div class="sub" id="totalTaskDisplay">মোট টাস্ক লোড হচ্ছে...</div>
-  <div class="everyday-target">🎯 প্রতিদিন ১টির বেশি অধ্যায় পড়তে হবে (মোট ৭৮ অধ্যায়, ৬ সপ্তাহ)</div>
-  <div class="prog-wrap"><div class="prog-bg"><div class="prog-fill" id="pgBar"></div></div><div class="prog-txt" id="pgTxt">0%</div></div>
-  
-  <!-- মেনু বাটন (শুধু লগইন অবস্থায় দেখাবে) -->
-  <button id="menuBtn" class="menu-btn hidden">☰</button>
-  <div id="dropdownMenu" class="dropdown-menu">
-    <div id="profileDisplay" class="profile-info">👤 লোড হচ্ছে...</div>
-    <button id="editNameBtn">✏️ আমার নাম পরিবর্তন</button>
-    <button id="menuLogoutBtn" class="logout-item">🚪 লগআউট</button>
+<div class="max-w-7xl mx-auto px-4 py-6 md:py-8">
+  <!-- হেডার : DORMANT BEAST নাম ও মেনু -->
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-8 glass-card px-6 py-3 sticky top-4 z-50 backdrop-blur-xl">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center shadow-lg">
+        <span class="text-xl">⚡</span>
+      </div>
+      <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">DORMANT BEAST</h1>
+    </div>
+    <div class="flex gap-2">
+      <button id="showPlannerBtn" class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition text-sm font-medium">📘 প্ল্যানার</button>
+      <button id="showTimerBtn" class="px-4 py-2 rounded-full bg-yellow-500/20 hover:bg-yellow-500/30 transition text-sm font-medium border border-yellow-500/40">⏱️ পমোডোরো</button>
+      <button id="showRankingBtn" class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition text-sm font-medium">🏆 র‍্যাংকিং</button>
+    </div>
+    <div id="userStatusArea" class="flex items-center gap-3"></div>
   </div>
-</div>
 
-<div class="login-panel" id="loginPanel">
-  <label>🔐 ভূমিকা:</label>
-  <select id="roleSelect"><option value="member">📖 সাধারণ সদস্য (Google)</option><option value="admin">👑 অ্যাডমিন</option></select>
-  <div id="memberLoginArea">
-    <button id="googleSignInBtn" class="google-btn">🔑 Google দিয়ে লগইন করুন</button>
+  <!-- লগইন প্যানেল -->
+  <div id="loginPanel" class="glass-card max-w-md mx-auto p-8 text-center hidden flex-col gap-5">
+    <h2 class="text-3xl font-bold">স্বাগতম</h2>
+    <p class="text-white/50 text-sm">আপনার অগ্রগতি সংরক্ষণ করতে লগইন করুন</p>
+    <select id="roleSelect" class="bg-black/40 border border-white/20 rounded-full px-4 py-2 text-white text-sm">
+      <option value="member">📖 সাধারণ সদস্য (Google)</option>
+      <option value="admin">👑 অ্যাডমিন</option>
+    </select>
+    <div id="memberLoginArea">
+      <button id="googleSignInBtn" class="btn-glow w-full text-black font-semibold py-3 rounded-full flex items-center justify-center gap-2">🔐 Google দিয়ে লগইন</button>
+    </div>
+    <div id="adminLoginArea" class="hidden flex flex-col gap-3">
+      <input type="password" id="adminPassword" placeholder="অ্যাডমিন পাসওয়ার্ড" class="bg-black/40 border border-white/20 rounded-full px-4 py-2 text-sm">
+      <button id="adminLoginBtn" class="bg-white/10 hover:bg-white/20 py-2 rounded-full">লগইন</button>
+    </div>
   </div>
-  <div id="adminLoginArea" class="hidden">
-    <label>🔑 অ্যাডমিন পাসওয়ার্ড:</label>
-    <input type="password" id="adminPassword" placeholder="পাসওয়ার্ড">
-    <button id="adminLoginBtn">লগইন</button>
+
+  <!-- অ্যাডমিন প্যানেল -->
+  <div id="adminPanel" class="hidden glass-card p-4 mb-6">
+    <div class="flex flex-wrap gap-3 justify-between items-center">
+      <div class="flex gap-2">
+        <button id="exportAllDataBtn" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm">📁 এক্সপোর্ট JSON</button>
+        <button id="memberListBtn" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm">📋 সদস্য তালিকা</button>
+        <button id="homeBtn" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm">🏠 হোম</button>
+      </div>
+      <div id="adminStatus" class="text-yellow-400 text-xs"></div>
+    </div>
   </div>
-  <button id="logoutBtn" class="logout-btn hidden">🚪 লগআউট</button>
+  <div id="adminUserListContainer" class="hidden glass-card p-4 mb-6 overflow-x-auto"></div>
+
+  <!-- র‍্যাংকিং সেকশন -->
+  <div id="rankingSection" class="mb-12 hidden">
+    <div class="glass-card p-6">
+      <div class="flex items-center gap-3 border-b border-white/10 pb-4 mb-5">
+        <span class="text-3xl">🏆</span>
+        <h2 class="text-2xl font-bold">স্টাডি লিডারবোর্ড</h2>
+        <span class="text-xs bg-yellow-500/20 px-3 py-1 rounded-full ml-auto">মোট ফোকাস মিনিট</span>
+      </div>
+      <div id="rankingList" class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+        <div class="text-center text-white/40 py-8">লোড হচ্ছে...</div>
+      </div>
+      <div class="mt-6 pt-4 border-t border-white/10 text-center text-sm text-white/40">
+        💡 প্রতিটি ফোকাস সেশন সম্পন্ন করলে মিনিট যোগ হবে এবং র‍্যাংক আপডেট হবে
+      </div>
+    </div>
+  </div>
+
+  <!-- পমোডোরো টাইমার সেকশন -->
+  <div id="timerSection" class="mb-12">
+    <div class="glass-card p-6 md:p-8">
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- টাইমার রিং -->
+        <div class="flex-1 flex flex-col items-center">
+          <div class="relative w-64 h-64 md:w-80 md:h-80">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6" />
+              <circle id="timerRing" cx="50" cy="50" r="45" fill="none" stroke="url(#gradient)" stroke-width="6" stroke-linecap="round" stroke-dasharray="282.74" stroke-dashoffset="0" class="timer-ring" />
+              <defs><linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#facc15"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient></defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="timerDisplay" class="text-5xl md:text-7xl font-mono font-bold tracking-wider">25:00</span>
+              <span id="sessionLabel" class="text-sm text-yellow-400/80 mt-2">ফোকাস সেশন</span>
+            </div>
+          </div>
+          <div class="flex gap-3 mt-8">
+            <button id="startTimerBtn" class="btn-glow text-black font-bold px-7 py-3 rounded-full">▶ শুরু</button>
+            <button id="pauseTimerBtn" class="bg-white/10 hover:bg-white/20 px-7 py-3 rounded-full">⏸ বিরতি</button>
+            <button id="resetTimerBtn" class="bg-white/10 hover:bg-white/20 px-7 py-3 rounded-full">⟳ রিসেট</button>
+          </div>
+        </div>
+        <!-- পরিসংখ্যান ও কাস্টমাইজ -->
+        <div class="flex-1 space-y-5">
+          <div class="flex gap-2 p-1 glass-panel rounded-full bg-black/30">
+            <button data-session="focus" class="session-tab flex-1 py-2 rounded-full text-sm font-medium transition-all bg-yellow-500/30 text-white">🎯 ফোকাস</button>
+            <button data-session="shortBreak" class="session-tab flex-1 py-2 rounded-full text-sm font-medium text-white/70">☕ শর্ট ব্রেক</button>
+            <button data-session="longBreak" class="session-tab flex-1 py-2 rounded-full text-sm font-medium text-white/70">🌿 লং ব্রেক</button>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="glass-card p-3 text-center"><div class="text-2xl font-bold text-yellow-400" id="totalSessionsToday">0</div><div class="text-xs text-white/50">আজকের সেশন</div></div>
+            <div class="glass-card p-3 text-center"><div class="text-2xl font-bold text-yellow-400" id="totalMinutesToday">0</div><div class="text-xs text-white/50">আজকের মিনিট</div></div>
+            <div class="glass-card p-3 text-center col-span-2"><div class="text-xl font-bold text-yellow-400" id="streakCount">0</div><div class="text-xs text-white/50">🔥 বর্তমান ধারা (দিন)</div></div>
+          </div>
+          <button id="openSettingsBtn" class="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 py-2 rounded-full text-sm">⚙️ সময় কাস্টমাইজ করুন</button>
+          <div><h3 class="text-sm font-semibold text-white/60 mb-2">সাম্প্রতিক সেশন</h3><div id="historyList" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- সেটিংস মডাল -->
+  <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="glass-card w-11/12 max-w-md p-6">
+      <h3 class="text-xl font-bold mb-4">সময় কাস্টমাইজ করুন (মিনিট)</h3>
+      <div class="space-y-4">
+        <div><label class="block text-sm mb-1">ফোকাস</label><input type="number" id="focusDuration" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2" value="25"></div>
+        <div><label class="block text-sm mb-1">শর্ট ব্রেক</label><input type="number" id="shortBreakDuration" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2" value="5"></div>
+        <div><label class="block text-sm mb-1">লং ব্রেক</label><input type="number" id="longBreakDuration" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2" value="15"></div>
+        <div class="flex gap-3 pt-2"><button id="saveSettingsBtn" class="btn-glow text-black font-bold flex-1 py-2 rounded-full">সংরক্ষণ</button><button id="closeSettingsBtn" class="bg-white/10 flex-1 py-2 rounded-full">বাতিল</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- প্ল্যানার সেকশন (অধ্যায় ভিত্তিক) -->
+  <div id="plannerSection" class="hidden">
+    <div class="glass-card p-6 mb-6 text-center">
+      <div class="flex justify-between items-center flex-wrap gap-2">
+        <div><span class="text-sm text-white/60">মোট টাস্ক</span><div class="text-2xl font-bold" id="totalTaskDisplay">0</div></div>
+        <div><span class="text-sm text-white/60">সম্পন্ন</span><div class="text-2xl font-bold text-yellow-400" id="pgTxtShort">0%</div></div>
+        <div class="flex-1 max-w-md"><div class="h-2 bg-white/10 rounded-full overflow-hidden"><div id="pgBar" class="h-full bg-gradient-to-r from-yellow-500 to-amber-500 w-0 transition-all"></div></div></div>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-3 mb-6">
+      <select id="subjectFilter" class="bg-black/30 border border-white/20 rounded-full px-4 py-2 text-sm">
+        <option value="all">সকল বিষয়</option>
+        <option value="পদার্থবিজ্ঞান ১ম পত্র">পদার্থ ১ম</option><option value="পদার্থবিজ্ঞান ২য় পত্র">পদার্থ ২য়</option>
+        <option value="রসায়ন ১ম পত্র">রসায়ন ১ম</option><option value="রসায়ন ২য় পত্র">রসায়ন ২য়</option>
+        <option value="জীববিজ্ঞান ১ম পত্র">জীব ১ম</option><option value="জীববিজ্ঞান ২য় পত্র">জীব ২য়</option>
+        <option value="উচ্চতর গণিত ১ম পত্র">উ. গণিত ১ম</option><option value="উচ্চতর গণিত ২য় পত্র">উ. গণিত ২য়</option>
+        <option value="তথ্য ও যোগাযোগ প্রযুক্তি">ICT</option>
+      </select>
+      <div id="weekButtons" class="flex flex-wrap gap-2"></div>
+      <button id="memberHomeBtn" class="ml-auto bg-yellow-500/20 px-4 py-2 rounded-full text-sm hidden">🏠 হোম</button>
+    </div>
+    <div id="plannerContainer" class="space-y-6"></div>
+  </div>
+
+  <button id="downloadBtn" class="fixed bottom-6 right-6 bg-white/10 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center text-xl hover:bg-white/20 transition-all z-40">📥</button>
 </div>
-
-<div id="adminPanel" class="admin-panel hidden">
-  <div><button id="exportAllDataBtn">📁 এক্সপোর্ট JSON</button><button id="memberListBtn">📋 সদস্য তালিকা</button><button id="homeBtn">🏠 হোম / লগইন</button></div>
-  <div id="adminStatus"></div>
-</div>
-
-<div id="adminUserListContainer" class="user-list hidden"></div>
-
-<div class="controls" id="memberControls" style="display: none;">
-  <label>বিষয় ফিল্টার :</label><select id="subjectFilter"><option value="all">সকল বিষয়</option><option value="পদার্থবিজ্ঞান ১ম পত্র">পদার্থ ১ম</option><option value="পদার্থবিজ্ঞান ২য় পত্র">পদার্থ ২য়</option><option value="রসায়ন ১ম পত্র">রসায়ন ১ম</option><option value="রসায়ন ২য় পত্র">রসায়ন ২য়</option><option value="জীববিজ্ঞান ১ম পত্র">জীব ১ম</option><option value="জীববিজ্ঞান ২য় পত্র">জীব ২য়</option><option value="উচ্চতর গণিত ১ম পত্র">উ. গণিত ১ম</option><option value="উচ্চতর গণিত ২য় পত্র">উ. গণিত ২য়</option><option value="তথ্য ও যোগাযোগ প্রযুক্তি">ICT</option></select>
-  <div class="fbtns" id="weekButtons"></div>
-  <button id="memberHomeBtn" class="member-home-btn">🏠 হোম / প্ল্যানার</button>
-</div>
-
-<div class="container" id="plannerContainer"></div>
-<button class="dl-btn" id="downloadBtn">📥 HTML ফাইল ডাউনলোড</button>
 
 <script>
+  // Firebase কনফিগারেশন (আপনার দেওয়া)
   const firebaseConfig = {
     apiKey: "AIzaSyCKAI1QVzRvOHYlhUWo2LE-82zoFI2bmJ0",
     authDomain: "hsc-planner-1b02f.firebaseapp.com",
@@ -176,181 +187,246 @@
   const auth = firebase.auth();
   const provider = new firebase.auth.GoogleAuthProvider();
 
-  // সব অধ্যায় (৭৮টি)
+  // ---------- গ্লোবাল ভেরিয়েবল ----------
+  let currentUser = null;      // ফায়ারবেস ইউজার (সদস্য)
+  let isAdmin = false;
+  let viewingUserId = null;
+  let activeWeek = null, currentSubject = 'all';
+
+  // পমোডোরো ভেরিয়েবল
+  let timerInterval = null;
+  let currentSessionType = 'focus';   // 'focus', 'shortBreak', 'longBreak'
+  let timeRemaining = 25 * 60;
+  let totalFocusSessionsCompleted = 0;
+  let settings = { focus: 25, shortBreak: 5, longBreak: 15 };
+  let sessionHistory = [];
+
+  // ---------- পমোডোরো ফাংশন ----------
+  function loadSettings() {
+    const saved = localStorage.getItem('pomodoro_settings');
+    if (saved) settings = { ...settings, ...JSON.parse(saved) };
+    document.getElementById('focusDuration').value = settings.focus;
+    document.getElementById('shortBreakDuration').value = settings.shortBreak;
+    document.getElementById('longBreakDuration').value = settings.longBreak;
+  }
+  function saveSettings() {
+    localStorage.setItem('pomodoro_settings', JSON.stringify(settings));
+    resetTimerUI();
+  }
+  // ইতিহাস লোড
+  const savedHistory = localStorage.getItem('pomodoro_history');
+  if (savedHistory) sessionHistory = JSON.parse(savedHistory);
+  else sessionHistory = [];
+
+  function addToHistory(type, duration) {
+    sessionHistory.unshift({ type, duration, completedAt: Date.now() });
+    if (sessionHistory.length > 10) sessionHistory.pop();
+    localStorage.setItem('pomodoro_history', JSON.stringify(sessionHistory));
+    renderHistory();
+    updateStats();
+  }
+  function renderHistory() {
+    const cont = document.getElementById('historyList');
+    if (!sessionHistory.length) {
+      cont.innerHTML = '<div class="text-center text-white/40 text-sm py-2">কোনো সেশন নেই</div>';
+      return;
+    }
+    cont.innerHTML = sessionHistory.map(h => {
+      const typeName = h.type === 'focus' ? '🎯 ফোকাস' : (h.type === 'shortBreak' ? '☕ শর্ট ব্রেক' : '🌿 লং ব্রেক');
+      const minsAgo = Math.floor((Date.now() - h.completedAt) / 60000);
+      return `<div class="flex justify-between text-sm p-2 bg-white/5 rounded-lg"><span>${typeName}</span><span>${h.duration} মিনিট</span><span class="text-white/40">${minsAgo} মিনিট আগে</span></div>`;
+    }).join('');
+  }
+  function updateStats() {
+    const today = new Date().toDateString();
+    const todayFocus = sessionHistory.filter(h => new Date(h.completedAt).toDateString() === today && h.type === 'focus');
+    const totalMins = todayFocus.reduce((s, h) => s + h.duration, 0);
+    document.getElementById('totalSessionsToday').innerText = todayFocus.length;
+    document.getElementById('totalMinutesToday').innerText = totalMins;
+    let streak = 0;
+    let d = new Date();
+    for (let i = 0; i < 30; i++) {
+      const dateStr = d.toDateString();
+      const has = sessionHistory.some(h => new Date(h.completedAt).toDateString() === dateStr && h.type === 'focus');
+      if (has) streak++;
+      else break;
+      d.setDate(d.getDate() - 1);
+    }
+    document.getElementById('streakCount').innerText = streak;
+  }
+  const circumference = 2 * Math.PI * 45; // 282.74
+  function updateTimerDisplay() {
+    const m = Math.floor(timeRemaining / 60);
+    const s = timeRemaining % 60;
+    document.getElementById('timerDisplay').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    const total = settings[currentSessionType] * 60;
+    const offset = circumference - (timeRemaining / total) * circumference;
+    document.getElementById('timerRing').style.strokeDashoffset = offset;
+  }
+  function setSessionLabel() {
+    const labels = { focus: '🎯 ফোকাস সেশন', shortBreak: '☕ শর্ট ব্রেক', longBreak: '🌿 লং ব্রেক' };
+    document.getElementById('sessionLabel').innerText = labels[currentSessionType];
+  }
+  function playBeep() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.frequency.value = 880;
+      gain.gain.value = 0.3;
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 1);
+      osc.stop(audioCtx.currentTime + 1);
+      audioCtx.resume();
+    } catch(e) { console.warn(e); }
+  }
+  function resetTimerUI() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    timeRemaining = settings[currentSessionType] * 60;
+    updateTimerDisplay();
+    setSessionLabel();
+  }
+  function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      if (timeRemaining <= 1) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        playBeep();
+        const duration = settings[currentSessionType];
+        addToHistory(currentSessionType, duration);
+        // ফোকাস সেশন হলে ফায়ারবেসে মিনিট যোগ করো
+        if (currentSessionType === 'focus' && currentUser && !isAdmin) {
+          const userRef = db.ref(`users/${currentUser.uid}/info`);
+          userRef.transaction(info => {
+            if (!info) info = { totalMinutes: 0 };
+            info.totalMinutes = (info.totalMinutes || 0) + duration;
+            return info;
+          });
+        }
+        // স্বয়ংক্রিয় সেশন পরিবর্তন
+        if (currentSessionType === 'focus') {
+          totalFocusSessionsCompleted++;
+          if (totalFocusSessionsCompleted % 4 === 0) currentSessionType = 'longBreak';
+          else currentSessionType = 'shortBreak';
+        } else {
+          currentSessionType = 'focus';
+        }
+        timeRemaining = settings[currentSessionType] * 60;
+        updateTimerDisplay();
+        setSessionLabel();
+        // আবার টাইমার চালু করো (অটো স্টার্ট)
+        startTimer();
+      } else {
+        timeRemaining--;
+        updateTimerDisplay();
+      }
+    }, 1000);
+  }
+  function switchSession(type) {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    currentSessionType = type;
+    timeRemaining = settings[type] * 60;
+    updateTimerDisplay();
+    setSessionLabel();
+    // ট্যাবের স্টাইল পরিবর্তন
+    document.querySelectorAll('.session-tab').forEach(tab => {
+      if (tab.dataset.session === type) {
+        tab.classList.add('bg-yellow-500/30', 'text-white');
+        tab.classList.remove('text-white/70');
+      } else {
+        tab.classList.remove('bg-yellow-500/30', 'text-white');
+        tab.classList.add('text-white/70');
+      }
+    });
+  }
+
+  // ---------- প্ল্যানার ডেটা (৭৮ অধ্যায়, ৬ সপ্তাহ) ----------
   const allChapters = [
-    { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "তাপগতিবিদ্যা" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "স্থির তড়িৎ" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "চল তড়িৎ" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "তড়িৎ প্রবাহের চুম্বকক্রিয়া" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "তড়িৎ চৌম্বকীয় আবেশ ও তড়িৎ প্রবাহ" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "জ্যামিতিক আলোকবিজ্ঞান" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "ভৌত আলোকবিজ্ঞান" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "আধুনিক পদার্থবিজ্ঞানের সূচনা" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "পরমাণুর মডেল ও নিউক্লিয়ার পদার্থ বিজ্ঞান" }, { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "সেমিকন্ডাক্টর ও ইলেকট্রনিক্স" },
-    { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "ভেক্টর" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "গতিবিদ্যা" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "নিউটনীয় বলবিদ্যা" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "কাজ ক্ষমতা শক্তি" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "মহাকর্ষ ও অভিকর্ষ" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "পদার্থের গাঠনিক ধর্ম" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "পর্যায় বৃত্ত গতি" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "তরঙ্গ" }, { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "আদর্শ গ্যাসের গতিতত্ত্ব" },
-    { subject: "রসায়ন ১ম পত্র", chapter: "গুণগত রসায়ন" }, { subject: "রসায়ন ১ম পত্র", chapter: "মৌলের পর্যায়বৃত্ত ধর্ম ও রাসায়নিক বন্ধন" }, { subject: "রসায়ন ১ম পত্র", chapter: "রাসায়নিক পরিবর্তন" }, { subject: "রসায়ন ১ম পত্র", chapter: "কর্মমুখী রসায়ন" },
-    { subject: "রসায়ন ২য় পত্র", chapter: "পরিবেশ রসায়ন" }, { subject: "রসায়ন ২য় পত্র", chapter: "জৈব রসায়ন" }, { subject: "রসায়ন ২য় পত্র", chapter: "পরিমাণগত রসায়ন" }, { subject: "রসায়ন ২য় পত্র", chapter: "তড়িৎ রসায়ন" }, { subject: "রসায়ন ২য় পত্র", chapter: "অর্থনৈতিক রসায়ন" },
-    { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "কোষ ও এর গঠন" }, { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "কোষ বিভাজন" }, { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "কোষ রসায়ন" }, { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "অণুজীব" }, { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "শৈবাল ও ছত্রাক" }, { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "ব্রায়োফাইটা ও টেরিডোফাইটা" }, { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "নগ্নবীজী ও আবৃতবীজি উদ্ভিদ" }, { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "টিস্যু টিস্যু তন্ত্র" }, { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "উদ্ভিদ শারীরতত্ত্ব" }, { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "উদ্ভিদ প্রজনন" }, { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "জীবপ্রযুক্তি" }, { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "জীবের পরিবেশ বিস্তার ও সংরক্ষণ" },
-    { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "প্রাণীর বিভিন্নতা ও শ্রেণিবিন্যাস" }, { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "প্রাণীর পরিচিতি" }, { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "পরিপাক ও শোষণ" }, { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "রক্ত ও সঞ্চালন" }, { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "শ্বসন ও শ্বামাক্রিয়া" }, { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "বর্জ্য ও নিষ্কাশন" }, { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "চলন ও অঙ্গচালনা" }, { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "সমন্বয় ও নিয়ন্ত্রণ" }, { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "মানব জীবনের ধারাবাহিকতা" }, { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "মানবদেহের প্রতিরক্ষা" }, { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "জিনতত্ত্ব ও বিবর্তন" }, { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "প্রাণীর আচরণ" },
-    { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "ম্যাট্রিক্স ও নির্নায়ক" }, { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "ভেক্টর" }, { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "সরলরেখা" }, { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "বৃত্ত" }, { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "বিন্যাস ও সমাবেশ" }, { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "ত্রিকোণমিতিক অনুপাত" }, { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "সংযুক্ত কোণের ত্রিকোণমিতিক অনুপাত" }, { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "ফাংশন ও ফাংশনের লেখচিত্র" }, { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "অন্তরীকরণ" }, { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "যোগজীকরণ" },
-    { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "বাস্তব সংখ্যা ও অসমতা" }, { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "যোগাশ্রয়ী প্রোগ্রাম" }, { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "জটিল সংখ্যা" }, { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "বহুপদী ও বহুপদীর সমীকরণ" }, { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "দ্বিপদী বিস্তৃতি" }, { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "কণিক" }, { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "বিপরীত ত্রিকোণমিতি" }, { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "স্থিতিবিদ্যা" }, { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "সমতলে বস্তুকণার গতি" }, { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "বিস্তার পরিমাপ সম্ভাবনা" },
-    { subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "বাংলাদেশ ও বিশ্ব প্রেক্ষিত" }, { subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "কমিউনিকেশন সিস্টেম ও নেটওয়ার্কিং" }, { subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "সংখ্যা পদ্ধতি ও ডিজিটাল ডিভাইস" }, { subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "ওয়েব ডিজাইন পরিচিতি ও HTML" }, { subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "প্রোগ্রামিং ভাষা" }, { subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "ডেটাবেজ ম্যানেজমেন্ট সিস্টেম" }
+    { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "তাপগতিবিদ্যা" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "স্থির তড়িৎ" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "চল তড়িৎ" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "তড়িৎ প্রবাহের চুম্বকক্রিয়া" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "তড়িৎ চৌম্বকীয় আবেশ ও তড়িৎ প্রবাহ" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "জ্যামিতিক আলোকবিজ্ঞান" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "ভৌত আলোকবিজ্ঞান" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "আধুনিক পদার্থবিজ্ঞানের সূচনা" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "পরমাণুর মডেল ও নিউক্লিয়ার পদার্থ বিজ্ঞান" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "সেমিকন্ডাক্টর ও ইলেকট্রনিক্স" },
+    { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "ভেক্টর" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "গতিবিদ্যা" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "নিউটনীয় বলবিদ্যা" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "কাজ ক্ষমতা শক্তি" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "মহাকর্ষ ও অভিকর্ষ" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "পদার্থের গাঠনিক ধর্ম" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "পর্যায় বৃত্ত গতি" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "তরঙ্গ" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "আদর্শ গ্যাসের গতিতত্ত্ব" },
+    { subject: "রসায়ন ১ম পত্র", chapter: "গুণগত রসায়ন" },{ subject: "রসায়ন ১ম পত্র", chapter: "মৌলের পর্যায়বৃত্ত ধর্ম ও রাসায়নিক বন্ধন" },{ subject: "রসায়ন ১ম পত্র", chapter: "রাসায়নিক পরিবর্তন" },{ subject: "রসায়ন ১ম পত্র", chapter: "কর্মমুখী রসায়ন" },
+    { subject: "রসায়ন ২য় পত্র", chapter: "পরিবেশ রসায়ন" },{ subject: "রসায়ন ২য় পত্র", chapter: "জৈব রসায়ন" },{ subject: "রসায়ন ২য় পত্র", chapter: "পরিমাণগত রসায়ন" },{ subject: "রসায়ন ২য় পত্র", chapter: "তড়িৎ রসায়ন" },{ subject: "রসায়ন ২য় পত্র", chapter: "অর্থনৈতিক রসায়ন" },
+    { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "কোষ ও এর গঠন" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "কোষ বিভাজন" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "কোষ রসায়ন" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "অণুজীব" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "শৈবাল ও ছত্রাক" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "ব্রায়োফাইটা ও টেরিডোফাইটা" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "নগ্নবীজী ও আবৃতবীজি উদ্ভিদ" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "টিস্যু টিস্যু তন্ত্র" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "উদ্ভিদ শারীরতত্ত্ব" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "উদ্ভিদ প্রজনন" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "জীবপ্রযুক্তি" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "জীবের পরিবেশ বিস্তার ও সংরক্ষণ" },
+    { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "প্রাণীর বিভিন্নতা ও শ্রেণিবিন্যাস" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "প্রাণীর পরিচিতি" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "পরিপাক ও শোষণ" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "রক্ত ও সঞ্চালন" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "শ্বসন ও শ্বামাক্রিয়া" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "বর্জ্য ও নিষ্কাশন" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "চলন ও অঙ্গচালনা" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "সমন্বয় ও নিয়ন্ত্রণ" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "মানব জীবনের ধারাবাহিকতা" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "মানবদেহের প্রতিরক্ষা" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "জিনতত্ত্ব ও বিবর্তন" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "প্রাণীর আচরণ" },
+    { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "ম্যাট্রিক্স ও নির্নায়ক" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "ভেক্টর" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "সরলরেখা" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "বৃত্ত" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "বিন্যাস ও সমাবেশ" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "ত্রিকোণমিতিক অনুপাত" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "সংযুক্ত কোণের ত্রিকোণমিতিক অনুপাত" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "ফাংশন ও ফাংশনের লেখচিত্র" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "অন্তরীকরণ" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "যোগজীকরণ" },
+    { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "বাস্তব সংখ্যা ও অসমতা" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "যোগাশ্রয়ী প্রোগ্রাম" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "জটিল সংখ্যা" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "বহুপদী ও বহুপদীর সমীকরণ" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "দ্বিপদী বিস্তৃতি" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "কণিক" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "বিপরীত ত্রিকোণমিতি" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "স্থিতিবিদ্যা" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "সমতলে বস্তুকণার গতি" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "বিস্তার পরিমাপ সম্ভাবনা" },
+    { subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "বাংলাদেশ ও বিশ্ব প্রেক্ষিত" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "কমিউনিকেশন সিস্টেম ও নেটওয়ার্কিং" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "সংখ্যা পদ্ধতি ও ডিজিটাল ডিভাইস" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "ওয়েব ডিজাইন পরিচিতি ও HTML" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "প্রোগ্রামিং ভাষা" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "ডেটাবেজ ম্যানেজমেন্ট সিস্টেম" }
   ];
   const totalChapters = allChapters.length;
   const totalTasks = totalChapters * 3;
+  // ৬ সপ্তাহ, প্রতি সপ্তাহে ১৩টি অধ্যায়
+  const weeks = [];
+  let startIdx = 0;
+  [13,13,13,13,13,13].forEach((size, i) => {
+    weeks.push({ id: i+1, label: `সপ্তাহ ${i+1}`, startIdx: startIdx, endIdx: startIdx+size-1, color: `hsl(${200+(i+1)*25},70%,55%)` });
+    startIdx += size;
+  });
 
-  // ৬ সপ্তাহে অধ্যায় বিতরণ
-  function distributeChaptersToWeeks(numWeeks = 6) {
-    const subjects = [...new Set(allChapters.map(c => c.subject))];
-    const subjectIndices = {};
-    subjects.forEach(sub => { subjectIndices[sub] = []; });
-    for (let i = 0; i < allChapters.length; i++) {
-      subjectIndices[allChapters[i].subject].push(i);
-    }
-    const targetPerWeekPerSubject = {};
-    subjects.forEach(sub => {
-      const total = subjectIndices[sub].length;
-      const base = Math.floor(total / numWeeks);
-      const rem = total % numWeeks;
-      targetPerWeekPerSubject[sub] = Array(numWeeks).fill(base);
-      for (let i = 0; i < rem; i++) targetPerWeekPerSubject[sub][i]++;
-    });
-    const weeks = [];
-    for (let w = 0; w < numWeeks; w++) weeks.push({ id: w+1, label: `সপ্তাহ ${w+1}`, chapterIndices: [] });
-    for (let sub of subjects) {
-      const indices = [...subjectIndices[sub]];
-      let pos = 0;
-      for (let w = 0; w < numWeeks; w++) {
-        const need = targetPerWeekPerSubject[sub][w];
-        for (let i = 0; i < need; i++) {
-          if (pos < indices.length) weeks[w].chapterIndices.push(indices[pos++]);
-        }
-      }
-    }
-    weeks.forEach(w => w.chapterIndices.sort((a,b)=>a-b));
-    weeks.forEach((w, idx) => w.color = `hsl(${200 + (idx+1)*25}, 70%, 48%)`);
-    return weeks;
-  }
-  const weeks = distributeChaptersToWeeks(6);
-
-  let currentUser = null;        // Firebase user object (member)
-  let isAdmin = false;
-  let viewingUserId = null;
-  let activeWeek = null;
-  let currentSubject = 'all';
-
-  // ডাটাবেস থেকে ইউজারের প্রোফাইল নাম আনা
-  async function getUserNickname(uid) {
-    const snap = await db.ref(`users/${uid}/info/nickname`).once('value');
-    return snap.val();
-  }
-  // প্রোফাইল নাম সেট করা
-  function setUserNickname(uid, nickname) {
-    return db.ref(`users/${uid}/info`).update({ nickname: nickname, displayName: nickname });
-  }
-
-  // মেনুতে প্রোফাইল অংশ আপডেট করা
-  async function updateProfileDisplay(user) {
-    const profileDiv = document.getElementById('profileDisplay');
-    if (!user) { profileDiv.innerHTML = '👤 লগইন নেই'; return; }
-    const nickname = await getUserNickname(user.uid);
-    if (nickname) {
-      profileDiv.innerHTML = `👤 ${nickname}`;
-    } else {
-      profileDiv.innerHTML = `👤 ${user.displayName || user.email}`;
-    }
-  }
-
-  // নাম পরিবর্তনের ফাংশন
-  async function changeNickname(user) {
-    const currentNick = await getUserNickname(user.uid);
-    const newName = prompt('আপনার পছন্দের নাম (নিকনেম) লিখুন:', currentNick || user.displayName || user.email);
-    if (newName && newName.trim()) {
-      await setUserNickname(user.uid, newName.trim());
-      await updateProfileDisplay(user);
-      // অ্যাডমিন তালিকা রিফ্রেশ করতে হবে যদি অ্যাডমিন লগইন করে থাকে
-      if (isAdmin) loadAllUsersAndRenderList();
-      alert('আপনার নাম সেভ হয়েছে!');
-    }
-  }
-
-  // রেন্ডার প্ল্যানার (আগের মতো)
-  function getSubjectColor(subject) {
-    if (subject.includes("পদার্থবিজ্ঞান")) return { bg: "#dbeafe", text: "#1e3a8a", border: "#3b82f6" };
-    if (subject.includes("রসায়ন")) return { bg: "#fce7f3", text: "#9d174d", border: "#ec4899" };
-    if (subject.includes("জীববিজ্ঞান")) return { bg: "#dcfce7", text: "#166534", border: "#22c55e" };
-    if (subject.includes("উচ্চতর গণিত")) return { bg: "#fed7aa", text: "#9a3412", border: "#f97316" };
-    if (subject.includes("তথ্য ও যোগাযোগ প্রযুক্তি")) return { bg: "#cffafe", text: "#075985", border: "#06b6d4" };
-    return { bg: "#f1f5f9", text: "#334155", border: "#94a3b8" };
-  }
   function defaultTaskState() {
     let state = {};
-    for (let i = 0; i < totalChapters; i++) state[`${i}_cq`] = state[`${i}_mcq`] = state[`${i}_kokh`] = false;
+    for (let i=0; i<totalChapters; i++) {
+      state[`${i}_cq`] = false;
+      state[`${i}_mcq`] = false;
+      state[`${i}_kokh`] = false;
+    }
     return state;
   }
+
   function updateProgress(tasks) {
     let done = 0;
-    for (let i = 0; i < totalChapters; i++) {
+    for (let i=0; i<totalChapters; i++) {
       if (tasks[`${i}_cq`]) done++;
       if (tasks[`${i}_mcq`]) done++;
       if (tasks[`${i}_kokh`]) done++;
     }
-    let percent = Math.round((done / totalTasks) * 100);
-    document.getElementById('pgBar').style.width = percent + '%';
-    document.getElementById('pgTxt').innerHTML = `${done} / ${totalTasks} টাস্ক সম্পন্ন (${percent}%)`;
-    document.getElementById('totalTaskDisplay').innerHTML = `📋 Total Task = ${totalTasks}`;
+    let percent = Math.round((done/totalTasks)*100);
+    document.getElementById('pgBar').style.width = percent+'%';
+    document.getElementById('pgTxtShort').innerHTML = percent+'%';
+    document.getElementById('totalTaskDisplay').innerHTML = totalTasks;
   }
-  function renderPlanner(tasks, readOnly = false) {
+
+  function renderPlanner(tasks, readOnly) {
     const container = document.getElementById('plannerContainer');
     container.innerHTML = '';
     if (!tasks) return;
-    if (isAdmin && viewingUserId) {
-      const banner = document.createElement('div');
-      banner.className = 'viewing-banner';
-      banner.innerHTML = `👁️ <strong>বর্তমানে দেখছেন: ${viewingUserId}</strong> (শুধুমাত্র দেখার মোড)`;
-      container.appendChild(banner);
-    }
     for (let week of weeks) {
-      if (activeWeek !== null && activeWeek !== week.id) continue;
-      let weekIndices = week.chapterIndices.filter(idx => currentSubject === 'all' || allChapters[idx].subject === currentSubject);
-      if (weekIndices.length === 0) continue;
+      if (activeWeek && activeWeek !== week.id) continue;
       const weekDiv = document.createElement('div');
-      weekDiv.style.marginBottom = '28px';
-      const header = document.createElement('div');
-      header.style.cssText = `display:flex; align-items:center; gap:12px; background:${week.color}; padding:10px 18px; border-radius:20px; color:white; margin-bottom:14px; font-weight:bold;`;
-      let completed = weekIndices.filter(idx => tasks[`${idx}_cq`] && tasks[`${idx}_mcq`] && tasks[`${idx}_kokh`]).length;
-      header.innerHTML = `<span style="background:rgba(255,255,255,0.2); padding:2px 12px; border-radius:30px;">${week.label}</span><span>সপ্তাহ ${week.id}</span><span style="margin-left:auto;">${completed}/${weekIndices.length} কাজ সম্পূর্ণ</span>`;
-      weekDiv.appendChild(header);
-      for (let idx of weekIndices) {
+      weekDiv.className = 'glass-card p-4 mb-4';
+      weekDiv.innerHTML = `<div class="flex justify-between items-center mb-3"><h3 class="font-bold text-yellow-400">${week.label}</h3><span class="text-sm">${week.endIdx-week.startIdx+1} অধ্যায়</span></div><div id="week-${week.id}" class="space-y-3"></div>`;
+      container.appendChild(weekDiv);
+      const subDiv = weekDiv.querySelector(`#week-${week.id}`);
+      for (let idx=week.startIdx; idx<=week.endIdx; idx++) {
         const chap = allChapters[idx];
-        const color = getSubjectColor(chap.subject);
+        if (currentSubject !== 'all' && chap.subject !== currentSubject) continue;
         const card = document.createElement('div');
-        card.className = 'task-card';
-        card.style.borderLeftColor = color.border;
+        card.className = 'p-3 rounded-xl bg-white/5 border-l-4 border-yellow-500/60';
         card.innerHTML = `
-          <div class="task-header"><span class="task-number">কাজ ${idx+1}</span><span class="subject-badge" style="background:${color.bg}; color:${color.text}">${chap.subject}</span></div>
-          <div class="chapter-name"><span>📘 ${chap.chapter}</span>${(tasks[`${idx}_cq`] && tasks[`${idx}_mcq`] && tasks[`${idx}_kokh`]) ? '<span class="complete-badge">✓ সম্পূর্ণ অধ্যায়</span>' : ''}</div>
-          <div class="segments" id="seg-${idx}"></div>
+          <div class="flex justify-between items-start flex-wrap">
+            <div><span class="text-xs text-white/50">${chap.subject}</span><div class="font-medium">${chap.chapter}</div></div>
+            <div class="flex gap-3 mt-2">
+              <label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_cq`] ? 'checked' : ''} data-idx="${idx}" data-type="cq" ${readOnly ? 'disabled' : ''}> CQ</label>
+              <label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_mcq`] ? 'checked' : ''} data-idx="${idx}" data-type="mcq" ${readOnly ? 'disabled' : ''}> MCQ</label>
+              <label class="flex items-center gap-1 text-xs"><input type="checkbox" ${tasks[`${idx}_kokh`] ? 'checked' : ''} data-idx="${idx}" data-type="kokh" ${readOnly ? 'disabled' : ''}> কখ</label>
+            </div>
+          </div>
         `;
-        weekDiv.appendChild(card);
-        const segDiv = card.querySelector(`#seg-${idx}`);
-        const makeSegment = (label, key) => {
-          const div = document.createElement('div');
-          div.className = 'seg-item';
-          const chk = document.createElement('input');
-          chk.type = 'checkbox';
-          chk.checked = tasks[key];
-          if (readOnly) chk.disabled = true;
-          if (!readOnly && !isAdmin) {
-            chk.addEventListener('change', () => {
-              tasks[key] = chk.checked;
+        subDiv.appendChild(card);
+        if (!readOnly && !isAdmin) {
+          card.querySelectorAll('input').forEach(inp => {
+            inp.addEventListener('change', () => {
+              tasks[`${idx}_${inp.dataset.type}`] = inp.checked;
               db.ref(`users/${currentUser.uid}/tasks`).set(tasks);
               renderPlanner(tasks, false);
             });
-          }
-          const lbl = document.createElement('span');
-          lbl.innerText = label;
-          div.appendChild(chk); div.appendChild(lbl);
-          return div;
-        };
-        segDiv.appendChild(makeSegment('CQ (সৃজনশীল)', `${idx}_cq`));
-        segDiv.appendChild(makeSegment('MCQ (বহুনির্বাচনি)', `${idx}_mcq`));
-        segDiv.appendChild(makeSegment('কখ (ক-খ অংশ)', `${idx}_kokh`));
-        if (readOnly) card.style.opacity = '0.8';
+          });
+        }
       }
-      container.appendChild(weekDiv);
     }
     updateProgress(tasks);
   }
@@ -358,241 +434,207 @@
   async function loadMemberTasks(user) {
     if (!user) return;
     const snap = await db.ref(`users/${user.uid}/tasks`).once('value');
-    let tasks = snap.val();
-    if (!tasks) tasks = defaultTaskState();
+    let tasks = snap.val() || defaultTaskState();
     renderPlanner(tasks, false);
-    // ইউজার ইনফো সেভ (নিকনেম থাকলে সেটা রেখে, না থাকলে গুগল নাম)
-    const infoSnap = await db.ref(`users/${user.uid}/info`).once('value');
-    const info = infoSnap.val() || {};
-    if (!info.nickname) {
-      // প্রথমবার লগইন, গুগলের নাম সেভ করে রাখি
-      await db.ref(`users/${user.uid}/info`).update({
-        email: user.email,
-        googleName: user.displayName || user.email,
-        lastLogin: Date.now()
-      });
-    } else {
-      await db.ref(`users/${user.uid}/info`).update({ lastLogin: Date.now() });
-    }
-    await updateProfileDisplay(user);
+    await db.ref(`users/${user.uid}/info`).update({
+      email: user.email,
+      googleName: user.displayName || user.email,
+      lastLogin: Date.now()
+    });
   }
 
-  async function loadAllUsersAndRenderList() {
-    if (!isAdmin) return;
-    const snap = await db.ref('users').once('value');
-    const users = snap.val() || {};
-    const container = document.getElementById('adminUserListContainer');
-    container.style.display = 'block';
-    const userIds = Object.keys(users);
-    if (userIds.length === 0) { container.innerHTML = '<p style="color:white;">কোনো সদস্য নেই</p>'; return; }
-    let html = '表<tr><thead><tr><th>নাম / নিকনেম</th><th>সম্পন্ন টাস্ক</th><th>মোট</th><th>অগ্রগতি</th><th></th></tr></thead><tbody>';
-    for (let uid of userIds) {
-      const info = users[uid]?.info || {};
-      let displayName = info.nickname || info.googleName || info.email || uid;
-      let tasks = users[uid]?.tasks || {};
-      let done = 0;
-      for (let i = 0; i < totalChapters; i++) {
-        if (tasks[`${i}_cq`]) done++;
-        if (tasks[`${i}_mcq`]) done++;
-        if (tasks[`${i}_kokh`]) done++;
-      }
-      let percent = Math.round((done / totalTasks) * 100);
-      html += `<tr><td>${displayName}</td><td>${done}</td><td>${totalTasks}</td><td>${percent}%</td><td><button class="view-user-btn" data-uid="${uid}">দেখুন</button></td></tr>`;
+  // র‍্যাংকিং ফাংশন (রিয়েল টাইম)
+  function renderRanking(usersSnap) {
+    const users = usersSnap.val() || {};
+    const list = [];
+    for (let uid in users) {
+      const info = users[uid].info || {};
+      const name = info.nickname || info.googleName || info.email || uid.slice(0,8);
+      const minutes = info.totalMinutes || 0;
+      list.push({ name, minutes });
     }
-    html += '</tbody></table>';
+    list.sort((a,b) => b.minutes - a.minutes);
+    const container = document.getElementById('rankingList');
+    if (list.length === 0) { container.innerHTML = '<div class="text-center text-white/40 py-6">কোনো ব্যবহারকারী নেই। লগইন করুন এবং ফোকাস শুরু করুন!</div>'; return; }
+    let html = '';
+    list.forEach((user, idx) => {
+      let medal = '';
+      if (idx===0) medal = '🥇 ';
+      else if (idx===1) medal = '🥈 ';
+      else if (idx===2) medal = '🥉 ';
+      else medal = `${idx+1}. `;
+      html += `<div class="flex justify-between items-center p-3 glass-card rounded-xl"><div class="flex items-center gap-3"><span class="font-mono w-8">${medal}</span><span class="font-medium">${escapeHtml(user.name)}</span></div><div class="flex items-center gap-2"><span class="text-yellow-400 font-bold">${user.minutes}</span><span class="text-xs text-white/50">মিনিট</span></div></div>`;
+    });
     container.innerHTML = html;
-    document.querySelectorAll('.view-user-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const uid = btn.getAttribute('data-uid');
-        viewingUserId = uid;
-        db.ref(`users/${uid}/tasks`).once('value', snap => {
-          renderPlanner(snap.val() || defaultTaskState(), true);
-        });
-        document.getElementById('adminStatus').innerHTML = `👁️ দেখছেন: ${uid} | `;
-        container.style.display = 'none';
+  }
+  function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+  let rankingUnsub = null;
+  function startRankingListener() {
+    if (rankingUnsub) rankingUnsub();
+    rankingUnsub = db.ref('users').on('value', (snap) => {
+      renderRanking(snap);
+      if (isAdmin && document.getElementById('adminUserListContainer').style.display === 'block') loadAllUsersAndRenderList();
+    });
+  }
+  function stopRankingListener() { if (rankingUnsub) { rankingUnsub(); rankingUnsub = null; } }
+
+  // অ্যাডমিন ফাংশন
+  function loadAllUsersAndRenderList() {
+    if (!isAdmin) return;
+    db.ref('users').once('value', snap => {
+      const users = snap.val() || {};
+      let html = '<table class="w-full text-sm"><thead><tr><th>নাম</th><th>মোট মিনিট</th><th>টাস্ক সম্পন্ন</th><th></th></tr></thead><tbody>';
+      for (let uid in users) {
+        const info = users[uid].info || {};
+        const name = info.nickname || info.googleName || info.email || uid;
+        const minutes = info.totalMinutes || 0;
+        let tasks = users[uid].tasks || {};
+        let done = 0;
+        for (let i=0; i<totalChapters; i++) {
+          if (tasks[`${i}_cq`]) done++;
+          if (tasks[`${i}_mcq`]) done++;
+          if (tasks[`${i}_kokh`]) done++;
+        }
+        html += `<tr><td>${name}</td><td>${minutes}</td><td>${done}/${totalTasks}</td><td><button class="view-user-btn bg-yellow-500/20 px-2 py-1 rounded text-xs" data-uid="${uid}">দেখুন</button></td></tr>`;
+      }
+      html += '</tbody></table>';
+      document.getElementById('adminUserListContainer').innerHTML = html;
+      document.querySelectorAll('.view-user-btn').forEach(btn => {
+        btn.onclick = () => {
+          viewingUserId = btn.dataset.uid;
+          db.ref(`users/${viewingUserId}/tasks`).once('value', s => renderPlanner(s.val() || defaultTaskState(), true));
+          document.getElementById('adminStatus').innerHTML = `দেখছেন: ${viewingUserId}`;
+        };
       });
     });
   }
 
-  // মেনু টগল
-  const menuBtn = document.getElementById('menuBtn');
-  const dropdown = document.getElementById('dropdownMenu');
-  menuBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    dropdown.classList.toggle('show');
-  });
-  document.addEventListener('click', function(e) {
-    if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.remove('show');
-  });
-  document.getElementById('menuLogoutBtn').addEventListener('click', () => {
-    if (isAdmin) {
-      isAdmin = false;
-      currentUser = null;
-      viewingUserId = null;
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('adminUserListContainer').style.display = 'none';
-      document.getElementById('memberControls').style.display = 'none';
-      document.getElementById('loginPanel').style.display = 'flex';
-      document.getElementById('plannerContainer').innerHTML = '';
-      document.getElementById('pgBar').style.width = '0%';
-      document.getElementById('pgTxt').innerHTML = '0%';
-      menuBtn.classList.add('hidden');
-    } else {
-      auth.signOut();
-    }
-    dropdown.classList.remove('show');
-  });
-  document.getElementById('editNameBtn').addEventListener('click', () => {
-    if (currentUser && !isAdmin) {
-      changeNickname(currentUser);
-    } else if (isAdmin) {
-      alert('অ্যাডমিন মোডে নাম পরিবর্তন করতে পারেন না।');
-    } else {
-      alert('লগইন করুন প্রথমে');
-    }
-  });
-
-  // গুগল সাইন-ইন
-  document.getElementById('googleSignInBtn').addEventListener('click', () => {
-    auth.signInWithPopup(provider).catch(err => alert('লগইন ব্যর্থ: '+err.message));
-  });
-  // অ্যাডমিন লগইন
-  document.getElementById('adminLoginBtn').addEventListener('click', async () => {
+  // UI টগল ও ইভেন্ট লিসেনার
+  document.getElementById('showPlannerBtn').onclick = () => {
+    document.getElementById('timerSection').classList.add('hidden');
+    document.getElementById('rankingSection').classList.add('hidden');
+    document.getElementById('plannerSection').classList.remove('hidden');
+    if (currentUser && !isAdmin) loadMemberTasks(currentUser);
+  };
+  document.getElementById('showTimerBtn').onclick = () => {
+    document.getElementById('plannerSection').classList.add('hidden');
+    document.getElementById('rankingSection').classList.add('hidden');
+    document.getElementById('timerSection').classList.remove('hidden');
+  };
+  document.getElementById('showRankingBtn').onclick = () => {
+    document.getElementById('plannerSection').classList.add('hidden');
+    document.getElementById('timerSection').classList.add('hidden');
+    document.getElementById('rankingSection').classList.remove('hidden');
+  };
+  document.getElementById('googleSignInBtn').onclick = () => auth.signInWithPopup(provider);
+  document.getElementById('adminLoginBtn').onclick = () => {
     const pwd = document.getElementById('adminPassword').value;
-    if (pwd !== 'dormant2025') { alert('ভুল পাসওয়ার্ড'); return; }
-    await auth.signOut(); // সাইন আউট করে
-    isAdmin = true;
-    currentUser = null;
-    viewingUserId = null;
-    document.getElementById('loginPanel').style.display = 'none';
-    document.getElementById('adminPanel').classList.remove('hidden');
-    document.getElementById('logoutBtn').classList.remove('hidden');
-    document.getElementById('memberControls').style.display = 'none';
-    document.getElementById('adminUserListContainer').style.display = 'block';
-    document.getElementById('plannerContainer').innerHTML = '<div style="text-align:center;padding:40px;">👑 অ্যাডমিন মোড: তালিকা থেকে দেখুন</div>';
-    await loadAllUsersAndRenderList();
-    menuBtn.classList.remove('hidden');
-    document.getElementById('profileDisplay').innerHTML = '👑 অ্যাডমিন';
-  });
-
-  // লগআউট বাটন (পুরনো)
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    if (isAdmin) {
-      isAdmin = false;
+    if (pwd === 'dormant2025') {
+      isAdmin = true;
       currentUser = null;
-      viewingUserId = null;
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('adminUserListContainer').style.display = 'none';
-      document.getElementById('memberControls').style.display = 'none';
-      document.getElementById('loginPanel').style.display = 'flex';
-      document.getElementById('plannerContainer').innerHTML = '';
-      document.getElementById('pgBar').style.width = '0%';
-      document.getElementById('pgTxt').innerHTML = '0%';
-      menuBtn.classList.add('hidden');
-    } else {
-      auth.signOut();
-    }
-  });
-
-  // অথ স্টেট লিসেনার
+      document.getElementById('loginPanel').classList.add('hidden');
+      document.getElementById('adminPanel').classList.remove('hidden');
+      document.getElementById('userStatusArea').innerHTML = '<span class="text-sm">👑 অ্যাডমিন</span><button id="adminLogout" class="text-xs bg-white/10 px-3 py-1 rounded-full">লগআউট</button>';
+      document.getElementById('adminLogout').onclick = () => { isAdmin = false; location.reload(); };
+      startRankingListener();
+      document.getElementById('timerSection').classList.remove('hidden');
+      document.getElementById('rankingSection').classList.add('hidden');
+      document.getElementById('plannerSection').classList.add('hidden');
+    } else alert('ভুল পাসওয়ার্ড');
+  };
   auth.onAuthStateChanged(async (user) => {
     if (user && !isAdmin) {
       currentUser = user;
       isAdmin = false;
-      viewingUserId = null;
-      document.getElementById('loginPanel').style.display = 'none';
+      document.getElementById('loginPanel').classList.add('hidden');
       document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('adminUserListContainer').style.display = 'none';
-      document.getElementById('logoutBtn').classList.remove('hidden');
-      document.getElementById('memberControls').style.display = 'flex';
-      document.getElementById('memberHomeBtn').classList.remove('hidden');
-      menuBtn.classList.remove('hidden');
+      document.getElementById('userStatusArea').innerHTML = `<div class="flex items-center gap-2"><span class="text-sm">👋 ${user.displayName || user.email}</span><button id="userLogout" class="text-xs bg-white/10 px-3 py-1 rounded-full">লগআউট</button><button id="editNicknameBtn" class="text-xs bg-yellow-500/20 px-3 py-1 rounded-full">✏️ নাম</button></div>`;
+      document.getElementById('userLogout').onclick = () => auth.signOut();
+      document.getElementById('editNicknameBtn').onclick = async () => {
+        const newNick = prompt('আপনার ডিসপ্লে নাম (নিকনেম) লিখুন:');
+        if (newNick) await db.ref(`users/${currentUser.uid}/info`).update({ nickname: newNick });
+      };
       await loadMemberTasks(user);
+      startRankingListener();
+      document.getElementById('timerSection').classList.remove('hidden');
+      document.getElementById('rankingSection').classList.add('hidden');
+      document.getElementById('plannerSection').classList.add('hidden');
     } else if (!user && !isAdmin) {
-      currentUser = null;
-      document.getElementById('loginPanel').style.display = 'flex';
-      document.getElementById('memberControls').style.display = 'none';
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('logoutBtn').classList.add('hidden');
-      document.getElementById('plannerContainer').innerHTML = '';
-      document.getElementById('pgBar').style.width = '0%';
-      document.getElementById('pgTxt').innerHTML = '0%';
-      menuBtn.classList.add('hidden');
+      document.getElementById('loginPanel').classList.remove('hidden');
+      document.getElementById('userStatusArea').innerHTML = '';
+      stopRankingListener();
     }
   });
 
-  // অন্যান্য ইভেন্ট
-  document.getElementById('memberHomeBtn').addEventListener('click', () => {
-    if (currentUser && !isAdmin) loadMemberTasks(currentUser);
-  });
-  document.getElementById('homeBtn').addEventListener('click', async () => {
-    if (isAdmin) {
-      viewingUserId = null;
-      document.getElementById('plannerContainer').innerHTML = '<div style="text-align:center;padding:40px;">👑 অ্যাডমিন মোড: তালিকা থেকে দেখুন</div>';
-      await loadAllUsersAndRenderList();
-    }
-  });
-  document.getElementById('memberListBtn').addEventListener('click', async () => {
-    if (isAdmin) {
-      viewingUserId = null;
-      document.getElementById('plannerContainer').innerHTML = '<div style="text-align:center;padding:40px;">👑 অ্যাডমিন মোড: তালিকা থেকে দেখুন</div>';
-      await loadAllUsersAndRenderList();
-    }
-  });
-  document.getElementById('roleSelect').addEventListener('change', (e) => {
-    const isAdminRole = e.target.value === 'admin';
-    document.getElementById('memberLoginArea').classList.toggle('hidden', isAdminRole);
-    document.getElementById('adminLoginArea').classList.toggle('hidden', !isAdminRole);
-  });
-  document.getElementById('subjectFilter').addEventListener('change', (e) => {
-    currentSubject = e.target.value;
-    if (currentUser && !isAdmin) loadMemberTasks(currentUser);
-    else if (isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val() || defaultTaskState(), true));
-  });
-  function buildWeekButtons() {
-    const btnContainer = document.getElementById('weekButtons');
-    btnContainer.innerHTML = '';
-    const allBtn = document.createElement('button');
-    allBtn.className = 'fbtn active';
-    allBtn.innerText = 'সব সপ্তাহ';
-    allBtn.onclick = () => { activeWeek = null; if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val()||defaultTaskState(), true)); updateActiveButton(allBtn); };
-    btnContainer.appendChild(allBtn);
-    weeks.forEach(w => {
-      const btn = document.createElement('button');
-      btn.className = 'fbtn';
-      btn.innerText = w.label;
-      btn.onclick = () => {
-        activeWeek = (activeWeek === w.id) ? null : w.id;
-        if(currentUser && !isAdmin) loadMemberTasks(currentUser);
-        else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value', snap => renderPlanner(snap.val()||defaultTaskState(), true));
-        updateActiveButton(btn);
-      };
-      btnContainer.appendChild(btn);
+  // টাইমার ইভেন্ট
+  document.getElementById('startTimerBtn').onclick = startTimer;
+  document.getElementById('pauseTimerBtn').onclick = () => { if (timerInterval) clearInterval(timerInterval); timerInterval = null; };
+  document.getElementById('resetTimerBtn').onclick = resetTimerUI;
+  document.querySelectorAll('.session-tab').forEach(btn => btn.onclick = () => switchSession(btn.dataset.session));
+  document.getElementById('openSettingsBtn').onclick = () => document.getElementById('settingsModal').classList.remove('hidden');
+  document.getElementById('closeSettingsBtn').onclick = () => document.getElementById('settingsModal').classList.add('hidden');
+  document.getElementById('saveSettingsBtn').onclick = () => {
+    settings.focus = parseInt(document.getElementById('focusDuration').value);
+    settings.shortBreak = parseInt(document.getElementById('shortBreakDuration').value);
+    settings.longBreak = parseInt(document.getElementById('longBreakDuration').value);
+    saveSettings();
+    resetTimerUI();
+    document.getElementById('settingsModal').classList.add('hidden');
+  };
+  document.getElementById('exportAllDataBtn').onclick = () => {
+    db.ref('users').once('value', snap => {
+      const blob = new Blob([JSON.stringify(snap.val(), null, 2)], {type: 'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `dormantbeast_data_${Date.now()}.json`;
+      a.click();
     });
-    function updateActiveButton(activeBtn) {
-      document.querySelectorAll('#weekButtons .fbtn').forEach(b => b.classList.remove('active'));
-      if (activeWeek === null) allBtn.classList.add('active');
-      else activeBtn.classList.add('active');
-    }
-  }
-  buildWeekButtons();
-  document.getElementById('exportAllDataBtn').addEventListener('click', async () => {
-    if (!isAdmin) return;
-    const snap = await db.ref('users').once('value');
-    const blob = new Blob([JSON.stringify(snap.val() || {}, null, 2)], {type: 'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `hsc_users_${new Date().toISOString().slice(0,19)}.json`;
-    a.click();
-  });
-  document.getElementById('downloadBtn').addEventListener('click', () => {
+  };
+  document.getElementById('memberListBtn').onclick = () => { loadAllUsersAndRenderList(); document.getElementById('adminUserListContainer').style.display = 'block'; };
+  document.getElementById('homeBtn').onclick = () => document.getElementById('adminUserListContainer').style.display = 'none';
+  document.getElementById('memberHomeBtn').onclick = () => { if (currentUser) loadMemberTasks(currentUser); };
+  document.getElementById('downloadBtn').onclick = () => {
     const html = document.documentElement.outerHTML;
     const blob = new Blob([html], {type: 'text/html'});
     const a = document.createElement('a');
-    a.download = 'HSC_Planner_ProfileName.html';
+    a.download = 'dormant_beast_planner.html';
     a.href = URL.createObjectURL(blob);
     a.click();
-  });
+  };
+  function buildWeekButtons() {
+    const cont = document.getElementById('weekButtons');
+    cont.innerHTML = '';
+    const allBtn = document.createElement('button');
+    allBtn.className = 'bg-yellow-500/30 px-3 py-1 rounded-full text-sm mr-1';
+    allBtn.innerText = 'সব সপ্তাহ';
+    allBtn.onclick = () => { activeWeek = null; if (currentUser && !isAdmin) loadMemberTasks(currentUser); };
+    cont.appendChild(allBtn);
+    weeks.forEach(w => {
+      const btn = document.createElement('button');
+      btn.className = 'bg-white/10 px-3 py-1 rounded-full text-sm hover:bg-white/20';
+      btn.innerText = w.label;
+      btn.onclick = () => {
+        activeWeek = (activeWeek === w.id) ? null : w.id;
+        if (currentUser && !isAdmin) loadMemberTasks(currentUser);
+      };
+      cont.appendChild(btn);
+    });
+  }
+  buildWeekButtons();
+  document.getElementById('subjectFilter').onchange = (e) => {
+    currentSubject = e.target.value;
+    if (currentUser && !isAdmin) loadMemberTasks(currentUser);
+  };
+  loadSettings();
+  resetTimerUI();
+  renderHistory();
+  updateStats();
+  startRankingListener(); // লগইন না থাকলেও শুধু লিসেনার চালু
+  // ডিফল্টভাবে টাইমার দেখাও
+  document.getElementById('timerSection').classList.remove('hidden');
+  document.getElementById('rankingSection').classList.add('hidden');
+  document.getElementById('plannerSection').classList.add('hidden');
 </script>
 </body>
 </html>
