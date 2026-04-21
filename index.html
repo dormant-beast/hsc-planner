@@ -13,67 +13,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', system-ui, sans-serif; }
-    body {
-      background: radial-gradient(circle at 20% 30%, #0f172a, #020617);
-      min-height: 100vh;
-      position: relative;
-    }
-    body::before {
-      content: '';
-      position: fixed;
-      width: 150vmax;
-      height: 150vmax;
-      background: radial-gradient(circle at 30% 40%, rgba(250,204,21,0.12) 0%, transparent 50%);
-      top: -20%;
-      left: -20%;
-      z-index: 0;
-      pointer-events: none;
-      animation: floatOrb 22s infinite alternate ease-in-out;
-    }
-    body::after {
-      content: '';
-      position: fixed;
-      width: 120vmax;
-      height: 120vmax;
-      background: radial-gradient(circle at 70% 80%, rgba(168,85,247,0.1) 0%, transparent 55%);
-      bottom: -10%;
-      right: -10%;
-      z-index: 0;
-      pointer-events: none;
-      animation: floatOrb2 28s infinite alternate;
-    }
+    body { background: radial-gradient(circle at 20% 30%, #0f172a, #020617); min-height: 100vh; position: relative; }
+    body::before { content: ''; position: fixed; width: 150vmax; height: 150vmax; background: radial-gradient(circle at 30% 40%, rgba(250,204,21,0.12) 0%, transparent 50%); top: -20%; left: -20%; z-index: 0; pointer-events: none; animation: floatOrb 22s infinite alternate; }
+    body::after { content: ''; position: fixed; width: 120vmax; height: 120vmax; background: radial-gradient(circle at 70% 80%, rgba(168,85,247,0.1) 0%, transparent 55%); bottom: -10%; right: -10%; z-index: 0; pointer-events: none; animation: floatOrb2 28s infinite alternate; }
     @keyframes floatOrb { 0% { transform: translate(0,0) scale(1); opacity: 0.5; } 100% { transform: translate(8%, 6%) scale(1.2); opacity: 0.9; } }
     @keyframes floatOrb2 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-6%, -10%) scale(1.15); } }
-    .glass-card {
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      border: 1px solid rgba(250, 204, 21, 0.15);
-      border-radius: 2rem;
-      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5), 0 0 0 1px rgba(250,204,21,0.05) inset;
-    }
-    .btn-glow {
-      background: linear-gradient(145deg, #fbbf24, #d97706);
-      color: black;
-      font-weight: 700;
-      box-shadow: 0 8px 18px -6px #f59e0b80, 0 0 0 1px #fde68a inset;
-    }
+    .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(250,204,21,0.15); border-radius: 2rem; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5), 0 0 0 1px rgba(250,204,21,0.05) inset; }
+    .btn-glow { background: linear-gradient(145deg, #fbbf24, #d97706); color: black; font-weight: 700; box-shadow: 0 8px 18px -6px #f59e0b80; }
     .timer-ring { filter: drop-shadow(0 0 10px #fbbf24); }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-thumb { background: #eab308; border-radius: 12px; }
+    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background: #eab308; border-radius: 12px; }
     .nav-pill { background: rgba(255,255,255,0.03); backdrop-filter: blur(8px); border: 1px solid rgba(255,215,0,0.2); }
     .nav-pill:hover { background: #facc1520; border-color: #facc15; }
     .member-circle { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 8px; position: relative; }
     .member-circle canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-    .circle-inner {
-      width: 68px; height: 68px; border-radius: 50%; background: #0f172a;
-      display: flex; align-items: center; justify-content: center; font-weight: bold;
-      font-size: 13px; z-index: 2; border: 2px solid #1e293b;
-    }
-    .member-card {
-      background: rgba(255,255,255,0.03); border-radius: 20px; padding: 16px 8px;
-      backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.05);
-    }
+    .circle-inner { width: 68px; height: 68px; border-radius: 50%; background: #0f172a; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; z-index: 2; border: 2px solid #1e293b; }
+    .member-card { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 16px 8px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.05); }
     .member-card.active-member { border-color: #22c55e80; background: rgba(34,197,94,0.05); }
   </style>
 </head>
@@ -135,18 +89,11 @@
     </div>
   </div>
 
-  <!-- WEEKLY REPORT -->
+  <!-- WEEKLY REPORT (PLACEHOLDER) -->
   <div id="reportSection" class="mb-12 hidden">
     <div class="glass-card p-6 md:p-8">
-      <div class="flex items-center justify-between border-b border-white/10 pb-5 mb-6">
-        <h2 class="text-2xl font-bold">📈 Weekly Report</h2>
-        <div class="flex gap-2">
-          <button id="prevWeekBtn" class="bg-white/5 px-4 py-2 rounded-full">◀</button>
-          <button id="nextWeekBtn" class="bg-white/5 px-4 py-2 rounded-full">▶</button>
-          <button id="currentWeekBtn" class="bg-yellow-500/20 px-4 py-2 rounded-full">This week</button>
-        </div>
-      </div>
-      <div id="reportContent" class="space-y-6"><div class="text-center text-white/40 py-12">Login to view</div></div>
+      <h2 class="text-2xl font-bold">📈 Weekly Report</h2>
+      <div id="reportContent" class="mt-4"><div class="text-center text-white/40 py-12">Coming soon</div></div>
     </div>
   </div>
 
@@ -213,7 +160,7 @@
     </div>
   </div>
 
-  <!-- PLANNER SECTION -->
+  <!-- PLANNER SECTION (সংক্ষিপ্ত) -->
   <div id="plannerSection" class="hidden">
     <div class="glass-card p-5 mb-6">
       <div class="flex justify-between items-center">
@@ -232,8 +179,6 @@
         <option value="তথ্য ও যোগাযোগ প্রযুক্তি">ICT</option>
       </select>
       <div id="weekButtons" class="flex flex-wrap gap-2"></div>
-      <button id="memberHomeBtn" class="ml-auto bg-yellow-500/20 px-5 py-2.5 rounded-full hidden">🏠 My tasks</button>
-      <button id="adminBackToListBtn" class="ml-2 bg-white/10 px-5 py-2.5 rounded-full hidden">◀ Back</button>
     </div>
     <div id="plannerContainer" class="space-y-5"></div>
   </div>
@@ -243,7 +188,7 @@
 
 <script>
   (function(){
-    // FIREBASE CONFIG
+    // FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyCKAI1QVzRvOHYlhUWo2LE-82zoFI2bmJ0",
       authDomain: "hsc-planner-1b02f.firebaseapp.com",
@@ -260,37 +205,19 @@
     provider.setCustomParameters({ prompt: 'select_account' });
 
     // GLOBAL STATE
-    let currentUser = null, isAdmin = false, viewingUserId = null;
-    let activeWeek = null, currentSubject = 'all';
+    let currentUser = null, isAdmin = false;
     let timerInterval = null, currentSessionType = 'focus', timeRemaining = 25*60;
-    let totalFocusSessionsCompleted = 0;
     let settings = { focus:25, shortBreak:5, longBreak:15 };
     let sessionHistory = [];
-    let reportWeekOffset = 0;
-    let rankUnsub = null, liveUnsub = null, liveTimerUpdater = null;
+    let liveTimerUpdater = null, rankUnsub = null, liveUnsub = null;
+    let chapters = []; // will be filled
 
-    // CHAPTERS (78)
-    const allChapters = [
-      { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Thermodynamics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Static Electricity" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Current Electricity" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Magnetic Effect of Current" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Electromagnetic Induction" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Geometrical Optics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Physical Optics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Introduction to Modern Physics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Atomic Models & Nuclear Physics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Semiconductors & Electronics" },
-      { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Vectors" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Dynamics" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Newtonian Mechanics" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Work, Power & Energy" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Gravitation" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Properties of Matter" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Circular Motion" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Waves" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Kinetic Theory of Gases" },
-      { subject: "রসায়ন ১ম পত্র", chapter: "Qualitative Chemistry" },{ subject: "রসায়ন ১ম পত্র", chapter: "Periodic Properties & Chemical Bonding" },{ subject: "রসায়ন ১ম পত্র", chapter: "Chemical Changes" },{ subject: "রসায়ন ১ম পত্র", chapter: "Applied Chemistry" },
-      { subject: "রসায়ন ২য় পত্র", chapter: "Environmental Chemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Organic Chemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Quantitative Chemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Electrochemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Economic Chemistry" },
-      { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Cell & Its Structure" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Cell Division" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Cell Chemistry" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Microorganisms" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Algae & Fungi" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Bryophyta & Pteridophyta" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Gymnosperms & Angiosperms" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Tissue & Tissue System" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Plant Physiology" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Plant Breeding" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Biotechnology" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Ecology & Conservation" },
-      { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Animal Diversity & Classification" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Introduction to Animals" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Digestion & Absorption" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Blood & Circulation" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Respiration & Breathing" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Excretion" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Movement & Locomotion" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Coordination & Control" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Human Continuity" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Human Defense" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Genetics & Evolution" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Animal Behavior" },
-      { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Matrices & Determinants" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Vectors" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Straight Lines" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Circles" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Permutation & Combination" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Trigonometric Ratios" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Trigonometric Ratios of Compound Angles" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Functions & Graphs" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Differentiation" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Integration" },
-      { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Real Numbers & Inequalities" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Linear Programming" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Complex Numbers" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Polynomials & Equations" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Binomial Expansion" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Conics" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Inverse Trigonometry" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Statics" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Dynamics of a Particle" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Probability & Statistics" },
-      { subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Bangladesh & Global Context" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Communication Systems & Networking" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Number System & Digital Devices" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Web Design & HTML" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Programming Languages" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Database Management System" }
-    ];
-    const weeks = []; let s=0; [13,13,13,13,13,13].forEach((sz,i)=>{ weeks.push({ id:i+1, label:`Week ${i+1}`, startIdx:s, endIdx:s+sz-1 }); s+=sz; });
-    function defaultTaskState(){ let st={}; for(let i=0;i<78;i++){ st[`${i}_cq`]=false; st[`${i}_mcq`]=false; st[`${i}_kokh`]=false; } return st; }
-
-    // HELPERS
+    // Helper
     function hideAll(){ ['plannerSection','timerSection','liveStudySection','rankingSection','reportSection'].forEach(id=>document.getElementById(id).classList.add('hidden')); }
     function showSection(id){ hideAll(); document.getElementById(id).classList.remove('hidden'); }
-    function escapeHtml(s){ return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]); }
     function getTodayStr(){ return new Date().toISOString().slice(0,10); }
 
-    // LIVE GROUP (YPT style)
+    // ========== LIVE GROUP ==========
     const dailyFocusRef = db.ref('dailyFocus');
     const activeSessionsRef = db.ref('activeSessions');
     const usersRef = db.ref('users');
@@ -343,7 +270,9 @@
       });
     }
 
-    // POMODORO
+    function escapeHtml(s){ return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]); }
+
+    // ========== POMODORO ==========
     function loadSettings(){ const s=localStorage.getItem('pomodoro_settings'); if(s) settings={...settings,...JSON.parse(s)}; document.getElementById('focusDuration').value=settings.focus; document.getElementById('shortBreakDuration').value=settings.shortBreak; document.getElementById('longBreakDuration').value=settings.longBreak; }
     function saveSettingsToStorage(){ localStorage.setItem('pomodoro_settings',JSON.stringify(settings)); resetTimerUI(); }
     const savedHist = localStorage.getItem('pomodoro_history'); sessionHistory = savedHist ? JSON.parse(savedHist) : [];
@@ -364,10 +293,9 @@
           if(currentSessionType==='focus' && currentUser && !isAdmin){
             addFocusSeconds(currentUser.uid, dur*60);
             db.ref(`users/${currentUser.uid}/info`).transaction(info=>{ if(!info) info={totalMinutes:0}; info.totalMinutes=(info.totalMinutes||0)+dur; return info; });
-            saveFocusMinutesToWeekly(currentUser.uid,dur);
             markUserInactive();
           }
-          if(currentSessionType==='focus'){ totalFocusSessionsCompleted++; currentSessionType = (totalFocusSessionsCompleted%4===0)?'longBreak':'shortBreak'; }
+          if(currentSessionType==='focus'){ currentSessionType = (document.querySelectorAll('.session-tab[data-session="focus"].bg-yellow-500/40').length && (totalFocusSessionsCompleted+1)%4===0)?'longBreak':'shortBreak'; totalFocusSessionsCompleted++; }
           else currentSessionType='focus';
           timeRemaining=settings[currentSessionType]*60; updateTimerDisplay(); setSessionLabel(); startTimer();
         } else { timeRemaining--; updateTimerDisplay(); }
@@ -379,14 +307,39 @@
       document.querySelectorAll('.session-tab').forEach(t=>t.classList.toggle('bg-yellow-500/40', t.dataset.session===type));
       if(type==='focus' && currentUser && !isAdmin) markUserActive();
     }
-    async function saveFocusMinutesToWeekly(uid,min){ const now=new Date(); const day=now.getDay(); const start=new Date(now); start.setDate(now.getDate()-(day===0?6:day-1)); start.setHours(0,0,0,0); const wk=`${start.getFullYear()}-${start.getMonth()+1}-${start.getDate()}`; await db.ref(`users/${uid}/weeklyReport/${wk}/days/${now.toISOString().slice(0,10)}`).transaction(c=>(c||0)+min); }
 
-    // WEEKLY REPORT (simplified but functional)
-    async function refreshReport(uid,off){ if(!uid) return; /* ... implement full report if needed, or skip for brevity */ document.getElementById('reportContent').innerHTML='<div class="text-center py-8">Report loading...</div>'; }
+    // ========== RANKING ==========
+    function startRankingListener(){
+      if(rankUnsub) rankUnsub();
+      rankUnsub=db.ref('users').on('value',snap=>{
+        const users=snap.val()||{}; const list=[];
+        for(let uid in users){ const info=users[uid].info||{}; list.push({name:info.nickname||info.googleName||info.email||uid.slice(0,8), mins:info.totalMinutes||0}); }
+        list.sort((a,b)=>b.mins-a.mins);
+        document.getElementById('rankingList').innerHTML=list.map((u,i)=>`<div class="flex justify-between p-4 glass-card rounded-xl"><span>${i+1}. ${escapeHtml(u.name)}</span><span class="text-yellow-400">${u.mins} min</span></div>`).join('')||'<div class="text-center py-8">No users</div>';
+      });
+    }
 
-    // PLANNER
-    function buildWeekButtons(){ const c=document.getElementById('weekButtons'); c.innerHTML=''; const all=document.createElement('button'); all.className='bg-yellow-500/30 px-4 py-2 rounded-full text-sm'; all.innerText='All weeks'; all.onclick=()=>{ activeWeek=null; reloadPlanner(); }; c.appendChild(all); weeks.forEach(w=>{ const b=document.createElement('button'); b.className='bg-white/5 px-4 py-2 rounded-full text-sm'; b.innerText=w.label; b.onclick=()=>{ activeWeek=(activeWeek===w.id)?null:w.id; reloadPlanner(); }; c.appendChild(b); }); }
-    function reloadPlanner(){ if(currentUser && !isAdmin) loadMemberTasks(currentUser); else if(isAdmin && viewingUserId) db.ref(`users/${viewingUserId}/tasks`).once('value',sn=>renderPlanner(sn.val()||defaultTaskState(),true)); }
+    // ========== PLANNER (সংক্ষিপ্ত) ==========
+    const allChapters = [
+      { subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Thermodynamics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Static Electricity" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Current Electricity" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Magnetic Effect of Current" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Electromagnetic Induction" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Geometrical Optics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Physical Optics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Introduction to Modern Physics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Atomic Models & Nuclear Physics" },{ subject: "পদার্থবিজ্ঞান ২য় পত্র", chapter: "Semiconductors & Electronics" },
+      { subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Vectors" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Dynamics" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Newtonian Mechanics" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Work, Power & Energy" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Gravitation" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Properties of Matter" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Circular Motion" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Waves" },{ subject: "পদার্থবিজ্ঞান ১ম পত্র", chapter: "Kinetic Theory of Gases" },
+      { subject: "রসায়ন ১ম পত্র", chapter: "Qualitative Chemistry" },{ subject: "রসায়ন ১ম পত্র", chapter: "Periodic Properties & Chemical Bonding" },{ subject: "রসায়ন ১ম পত্র", chapter: "Chemical Changes" },{ subject: "রসায়ন ১ম পত্র", chapter: "Applied Chemistry" },
+      { subject: "রসায়ন ২য় পত্র", chapter: "Environmental Chemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Organic Chemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Quantitative Chemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Electrochemistry" },{ subject: "রসায়ন ২য় পত্র", chapter: "Economic Chemistry" },
+      { subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Cell & Its Structure" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Cell Division" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Cell Chemistry" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Microorganisms" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Algae & Fungi" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Bryophyta & Pteridophyta" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Gymnosperms & Angiosperms" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Tissue & Tissue System" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Plant Physiology" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Plant Breeding" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Biotechnology" },{ subject: "জীববিজ্ঞান ১ম পত্র", chapter: "Ecology & Conservation" },
+      { subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Animal Diversity & Classification" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Introduction to Animals" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Digestion & Absorption" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Blood & Circulation" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Respiration & Breathing" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Excretion" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Movement & Locomotion" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Coordination & Control" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Human Continuity" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Human Defense" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Genetics & Evolution" },{ subject: "জীববিজ্ঞান ২য় পত্র", chapter: "Animal Behavior" },
+      { subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Matrices & Determinants" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Vectors" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Straight Lines" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Circles" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Permutation & Combination" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Trigonometric Ratios" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Trigonometric Ratios of Compound Angles" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Functions & Graphs" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Differentiation" },{ subject: "উচ্চতর গণিত ১ম পত্র", chapter: "Integration" },
+      { subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Real Numbers & Inequalities" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Linear Programming" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Complex Numbers" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Polynomials & Equations" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Binomial Expansion" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Conics" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Inverse Trigonometry" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Statics" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Dynamics of a Particle" },{ subject: "উচ্চতর গণিত ২য় পত্র", chapter: "Probability & Statistics" },
+      { subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Bangladesh & Global Context" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Communication Systems & Networking" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Number System & Digital Devices" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Web Design & HTML" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Programming Languages" },{ subject: "তথ্য ও যোগাযোগ প্রযুক্তি", chapter: "Database Management System" }
+    ];
+    const weeks = []; let s=0; [13,13,13,13,13,13].forEach((sz,i)=>{ weeks.push({ id:i+1, label:`Week ${i+1}`, startIdx:s, endIdx:s+sz-1 }); s+=sz; });
+    function defaultTaskState(){ let st={}; for(let i=0;i<78;i++){ st[`${i}_cq`]=false; st[`${i}_mcq`]=false; st[`${i}_kokh`]=false; } return st; }
+    function buildWeekButtons(){
+      const c=document.getElementById('weekButtons'); c.innerHTML='';
+      const all=document.createElement('button'); all.className='bg-yellow-500/30 px-4 py-2 rounded-full text-sm'; all.innerText='All weeks'; all.onclick=()=>{ activeWeek=null; reloadPlanner(); }; c.appendChild(all);
+      weeks.forEach(w=>{ const b=document.createElement('button'); b.className='bg-white/5 px-4 py-2 rounded-full text-sm'; b.innerText=w.label; b.onclick=()=>{ activeWeek=(activeWeek===w.id)?null:w.id; reloadPlanner(); }; c.appendChild(b); });
+    }
+    let activeWeek=null, currentSubject='all';
+    function reloadPlanner(){ if(currentUser && !isAdmin) loadMemberTasks(currentUser); }
     function renderPlanner(tasks,readOnly=false){
       const cont=document.getElementById('plannerContainer'); cont.innerHTML=''; if(!tasks) return; let totalDone=0;
       for(let w of weeks){ if(activeWeek && activeWeek!==w.id) continue; const d=document.createElement('div'); d.className='glass-card p-5'; d.innerHTML=`<h3 class="font-bold text-yellow-300">${w.label}</h3><div id="week-${w.id}" class="space-y-3 mt-3"></div>`; cont.appendChild(d); const sub=d.querySelector(`#week-${w.id}`);
@@ -402,23 +355,17 @@
     }
     async function loadMemberTasks(user){ if(!user) return; const snap=await db.ref(`users/${user.uid}/tasks`).once('value'); renderPlanner(snap.val()||defaultTaskState(),false); }
 
-    // RANKING
-    function startRankingListener(){ if(rankUnsub) rankUnsub(); rankUnsub=db.ref('users').on('value',snap=>{ const users=snap.val()||{}; const list=[]; for(let uid in users){ const info=users[uid].info||{}; list.push({name:info.nickname||info.googleName||info.email||uid.slice(0,8), mins:info.totalMinutes||0}); } list.sort((a,b)=>b.mins-a.mins); document.getElementById('rankingList').innerHTML=list.map((u,i)=>`<div class="flex justify-between p-4 glass-card rounded-xl"><span>${i+1}. ${escapeHtml(u.name)}</span><span class="text-yellow-400">${u.mins} min</span></div>`).join('')||'<div class="text-center py-8">No users</div>'; }); }
-
-    // ADMIN
-    async function loadMemberList(){ if(!isAdmin) return; const snap=await db.ref('users').once('value'); const users=snap.val()||{}; let html='<table class="w-full text-sm"><tr><th>Member</th><th>Mins</th><th>Tasks</th></tr>'; for(let uid in users){ const info=users[uid].info||{}; const name=info.nickname||info.googleName||info.email||uid; const mins=info.totalMinutes||0; const tasks=users[uid].tasks||{}; let done=0; for(let i=0;i<78;i++){ if(tasks[`${i}_cq`]) done++; if(tasks[`${i}_mcq`]) done++; if(tasks[`${i}_kokh`]) done++; } html+=`<tr><td>${escapeHtml(name)}</td><td>${mins}</td><td>${done}/234</td><td><button class="view-badge view-user-btn" data-uid="${uid}">View</button></td></tr>`; } html+='</table>'; document.getElementById('adminUserListContainer').innerHTML=html; document.querySelectorAll('.view-user-btn').forEach(b=>b.onclick=()=>{ viewingUserId=b.dataset.uid; db.ref(`users/${viewingUserId}/tasks`).once('value',sn=>renderPlanner(sn.val()||defaultTaskState(),true)); document.getElementById('adminUserListContainer').style.display='none'; document.getElementById('adminBackToListBtn').classList.remove('hidden'); showSection('plannerSection'); }); }
-
-    // EVENT LISTENERS & INIT
+    // ========== EVENT LISTENERS & INIT ==========
     document.addEventListener('DOMContentLoaded',()=>{
       document.getElementById('roleSelect').addEventListener('change',e=>{ const isM=e.target.value==='member'; document.getElementById('memberLoginArea').classList.toggle('hidden',!isM); document.getElementById('adminLoginArea').classList.toggle('hidden',isM); });
       document.getElementById('googleSignInBtn').onclick=async ()=>{ try{ await auth.signInWithPopup(provider); }catch(e){ document.getElementById('loginErrorMsg').classList.remove('hidden'); document.getElementById('loginErrorMsg').innerText=e.message; } };
-      document.getElementById('adminLoginBtn').onclick=()=>{ if(document.getElementById('adminPassword').value==='dormant2025'){ isAdmin=true; currentUser=null; document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); document.getElementById('userStatusArea').innerHTML='<span>👑 Admin</span><button id="adminLogout" class="bg-white/10 px-4 py-2 rounded-full">Logout</button>'; document.getElementById('adminLogout').onclick=()=>location.reload(); startRankingListener(); showSection('timerSection'); loadMemberList(); document.getElementById('adminUserListContainer').style.display='block'; } else alert('Wrong password'); };
+      document.getElementById('adminLoginBtn').onclick=()=>{ if(document.getElementById('adminPassword').value==='dormant2025'){ isAdmin=true; currentUser=null; document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); document.getElementById('userStatusArea').innerHTML='<span>👑 Admin</span><button id="adminLogout" class="bg-white/10 px-4 py-2 rounded-full">Logout</button>'; document.getElementById('adminLogout').onclick=()=>location.reload(); startRankingListener(); showSection('timerSection'); } else alert('Wrong password'); };
       auth.onAuthStateChanged(async user=>{ if(user && !isAdmin){ currentUser=user; document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('userStatusArea').innerHTML=`<span>👋 ${user.displayName||user.email}</span><button id="userLogout" class="bg-white/10 px-4 py-2 rounded-full">Logout</button>`; document.getElementById('userLogout').onclick=()=>auth.signOut(); await loadMemberTasks(user); startRankingListener(); listenToLiveGroup(); showSection('timerSection'); } else if(!user && !isAdmin){ document.getElementById('loginPanel').classList.remove('hidden'); } });
       document.getElementById('showPlannerBtn').onclick=()=>{ showSection('plannerSection'); if(currentUser) loadMemberTasks(currentUser); };
       document.getElementById('showTimerBtn').onclick=()=>showSection('timerSection');
       document.getElementById('showLiveBtn').onclick=()=>showSection('liveStudySection');
       document.getElementById('showRankingBtn').onclick=()=>showSection('rankingSection');
-      document.getElementById('showReportBtn').onclick=()=>{ showSection('reportSection'); if(currentUser) refreshReport(currentUser.uid,reportWeekOffset); };
+      document.getElementById('showReportBtn').onclick=()=>showSection('reportSection');
       document.getElementById('startTimerBtn').onclick=startTimer;
       document.getElementById('pauseTimerBtn').onclick=()=>{ if(timerInterval) clearInterval(timerInterval); timerInterval=null; if(currentSessionType==='focus' && currentUser) markUserInactive(); };
       document.getElementById('resetTimerBtn').onclick=()=>{ resetTimerUI(); if(currentSessionType==='focus' && currentUser) markUserInactive(); };
@@ -427,9 +374,6 @@
       document.getElementById('closeSettingsBtn').onclick=()=>document.getElementById('settingsModal').classList.add('hidden');
       document.getElementById('saveSettingsBtn').onclick=()=>{ settings.focus=+document.getElementById('focusDuration').value; settings.shortBreak=+document.getElementById('shortBreakDuration').value; settings.longBreak=+document.getElementById('longBreakDuration').value; saveSettingsToStorage(); document.getElementById('settingsModal').classList.add('hidden'); };
       document.getElementById('subjectFilter').onchange=e=>{ currentSubject=e.target.value; reloadPlanner(); };
-      document.getElementById('memberListBtn').onclick=()=>{ loadMemberList(); document.getElementById('adminUserListContainer').style.display='block'; };
-      document.getElementById('adminBackToListBtn').onclick=()=>{ viewingUserId=null; document.getElementById('adminBackToListBtn').classList.add('hidden'); loadMemberList(); document.getElementById('adminUserListContainer').style.display='block'; };
-      document.getElementById('exportAllDataBtn').onclick=()=>{ db.ref('users').once('value',sn=>{ const b=new Blob([JSON.stringify(sn.val(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`data_${Date.now()}.json`; a.click(); }); };
       document.getElementById('downloadBtn').onclick=()=>{ const b=new Blob([document.documentElement.outerHTML],{type:'text/html'}); const a=document.createElement('a'); a.download='dormant_beast.html'; a.href=URL.createObjectURL(b); a.click(); };
       buildWeekButtons(); loadSettings(); resetTimerUI(); renderHistory(); updateStats(); startRankingListener(); listenToLiveGroup();
     });
